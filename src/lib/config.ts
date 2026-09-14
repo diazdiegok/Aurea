@@ -22,7 +22,7 @@ export const SITE = {
 } as const;
 
 /** URL pública de producción (fallback si falta env en Render) */
-export const PRODUCTION_BASE_URL = "https://aurea-lsyq.onrender.com";
+export const PRODUCTION_BASE_URL = "https://aurea-isyq.onrender.com";
 
 export function getBaseUrl() {
   const fromEnv = (
