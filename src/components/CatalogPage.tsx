@@ -19,7 +19,12 @@ type Product = {
   promotionEndsAt?: string | null;
 };
 
-const CATEGORY_ORDER = ["Sin Bordes", "Bordes de Acero", "Plata 925", "Mascotas"];
+const CATEGORY_ORDER = ["Plata 925", "18k", "Sin Bordes", "Bordes de Acero", "Mascotas"];
+const PINNED_CATEGORIES = ["Plata 925", "18k"];
+
+function sameCategory(a: string, b: string) {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -46,19 +51,29 @@ export function CatalogPage() {
   }, []);
 
   const categories = useMemo(() => {
-    const unique = [...new Set(products.map((p) => p.category))];
-    unique.sort(
-      (a, b) =>
-        (CATEGORY_ORDER.indexOf(a) === -1 ? 99 : CATEGORY_ORDER.indexOf(a)) -
-        (CATEGORY_ORDER.indexOf(b) === -1 ? 99 : CATEGORY_ORDER.indexOf(b))
+    const unique = [...new Set(products.map((p) => p.category).filter(Boolean))];
+    const labels = PINNED_CATEGORIES.map(
+      (pinned) => unique.find((c) => sameCategory(c, pinned)) ?? pinned
     );
-    return ["Todos", ...unique];
+    const extra = unique.filter(
+      (c) => !labels.some((label) => sameCategory(label, c))
+    );
+    extra.sort(
+      (a, b) =>
+        (CATEGORY_ORDER.findIndex((x) => sameCategory(x, a)) === -1
+          ? 99
+          : CATEGORY_ORDER.findIndex((x) => sameCategory(x, a))) -
+        (CATEGORY_ORDER.findIndex((x) => sameCategory(x, b)) === -1
+          ? 99
+          : CATEGORY_ORDER.findIndex((x) => sameCategory(x, b)))
+    );
+    return ["Todos", ...labels, ...extra];
   }, [products]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const list = products.filter((p) => {
-      if (category !== "Todos" && p.category !== category) return false;
+      if (category !== "Todos" && !sameCategory(p.category, category)) return false;
       if (!q) return true;
       return (
         p.name.toLowerCase().includes(q) ||
@@ -112,34 +127,22 @@ export function CatalogPage() {
         </Reveal>
 
         <div className="sticky top-[56px] z-30 border-b border-[#e4d5c5]/80 bg-[#f7f1ea]/95 backdrop-blur-md sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-none">
-          <div className="mx-auto flex max-w-2xl flex-col gap-3 px-5 py-3.5 sm:px-0 sm:py-6">
-            <label className="relative block">
-              <span className="sr-only">Buscar piezas</span>
-              <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a67c52]" />
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar por nombre, descripción o categoría"
-                className="w-full rounded-full border border-[#e4d5c5] bg-white/80 py-2.5 pl-10 pr-4 text-sm text-[#4a3b30] outline-none placeholder:text-[#8a7b6e] focus:border-[#c9b29a] focus:ring-2 focus:ring-[#c9956a]/20"
-              />
-            </label>
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              {categories.length > 1 &&
-                categories.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setCategory(cat)}
-                    className={`shrink-0 rounded-full px-4 py-2 text-[13px] transition duration-300 sm:px-5 sm:text-sm ${
-                      category === cat
-                        ? "bg-[#4a3b30] text-[#f7f1ea] shadow-[0_8px_18px_-10px_rgba(74,59,48,0.8)]"
-                        : "bg-white/70 text-[#6d5c4d] ring-1 ring-[#e4d5c5] hover:text-[#4a3b30] hover:ring-[#c9b29a]"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+          <div className="flex flex-col gap-3 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-0 sm:py-6">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCategory(cat)}
+                  className={`shrink-0 rounded-full px-4 py-2 text-[13px] transition duration-300 sm:px-5 sm:text-sm ${
+                    sameCategory(category, cat)
+                      ? "bg-[#4a3b30] text-[#f7f1ea] shadow-[0_8px_18px_-10px_rgba(74,59,48,0.8)]"
+                      : "bg-white/70 text-[#6d5c4d] ring-1 ring-[#e4d5c5] hover:text-[#4a3b30] hover:ring-[#c9b29a]"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
@@ -152,6 +155,17 @@ export function CatalogPage() {
                 <option value="name">Nombre A–Z</option>
               </select>
             </div>
+            <label className="relative w-full shrink-0 sm:max-w-xs">
+              <span className="sr-only">Buscar piezas</span>
+              <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a67c52]" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar"
+                className="w-full rounded-full border border-[#e4d5c5] bg-white/80 py-2.5 pl-10 pr-4 text-sm text-[#4a3b30] outline-none placeholder:text-[#8a7b6e] focus:border-[#c9b29a] focus:ring-2 focus:ring-[#c9956a]/20"
+              />
+            </label>
           </div>
         </div>
 
