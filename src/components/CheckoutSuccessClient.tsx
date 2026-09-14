@@ -31,10 +31,10 @@ export function CheckoutSuccessClient() {
     }
 
     try {
-      const raw = sessionStorage.getItem("eternity-mp-order");
+      const raw = sessionStorage.getItem("aurea-mp-order");
       if (raw) {
         setStored(JSON.parse(raw));
-        sessionStorage.removeItem("eternity-mp-order");
+        sessionStorage.removeItem("aurea-mp-order");
       }
     } catch {
       /* ignore */

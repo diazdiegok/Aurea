@@ -249,7 +249,7 @@ export function AdminPanel() {
           >
             <h1 className="font-serif text-3xl text-stone-800">Panel admin</h1>
             <p className="mt-2 text-sm text-stone-500">
-              Acceso solo para administradores de Eternity Recuerdos
+              Acceso solo para administradores de Aurea Joyas ADN
             </p>
             <label className="mt-6 block text-sm font-medium text-stone-700">
               Contraseña

@@ -39,7 +39,7 @@ export async function createCheckoutPreference(
         currency_id: "ARS",
       })),
       external_reference: options?.orderId || undefined,
-      statement_descriptor: options?.orderCode?.slice(0, 22) || "ETERNITY",
+      statement_descriptor: options?.orderCode?.slice(0, 22) || "AUREA",
       back_urls: {
         success: `${baseUrl}/checkout/exito`,
         failure: `${baseUrl}/checkout/error`,

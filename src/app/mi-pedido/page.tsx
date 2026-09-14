@@ -4,7 +4,7 @@ import { OrderLookupForm } from "@/components/OrderLookupForm";
 import { TruckIcon } from "@/components/Icons";
 
 export const metadata: Metadata = {
-  title: "Consultar mi pedido | Eternity Recuerdos",
+  title: "Consultar mi pedido | Aurea Joyas ADN",
   description: "Consultá el estado de tu pedido con el N° de orden y tu correo.",
 };
 

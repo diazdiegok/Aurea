@@ -5,7 +5,7 @@ import { generateSecret, generateURI } from "otplib";
 import QRCode from "qrcode";
 
 const envPath = resolve(process.cwd(), ".env");
-const issuer = "Eternity Recuerdos";
+const issuer = "Aurea Joyas ADN";
 const label = "Admin";
 
 let secret = process.env.ADMIN_TOTP_SECRET?.trim();

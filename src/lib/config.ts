@@ -1,16 +1,16 @@
 export const SITE = {
-  name: "Eternity",
-  brandFull: "Eternity Recuerdos",
+  name: "Aurea",
+  brandFull: "Aurea Joyas ADN",
   /** Nombre que aparece en correos al cliente */
-  emailBrand: "Eternity Joyas Maternas",
+  emailBrand: "Aurea Joyas ADN",
   tagline: "Joyas de leche materna",
   subtitle: "Accesorios y box personalizados",
   whatsapp: "5493435001061",
-  instagram: "https://www.instagram.com/eternity.recuerdos",
+  instagram: "https://www.instagram.com/aurea.joyasadn",
   currency: "ARS",
   /** Avisos internos cuando llega un pedido web */
   orderNotifyEmails: [
-    "eternityjoyasmaternas@gmail.com",
+    "aureajoyasadn@gmail.com",
     "vfontanetto@gmail.com",
   ],
   transfer: {
@@ -21,7 +21,7 @@ export const SITE = {
 } as const;
 
 /** URL pública de producción (fallback si falta env en Render) */
-export const PRODUCTION_BASE_URL = "https://eternity-i5n2.onrender.com";
+export const PRODUCTION_BASE_URL = "https://aurea.onrender.com";
 
 export function getBaseUrl() {
   const fromEnv = (
@@ -41,5 +41,5 @@ export function getBaseUrl() {
 
 /** Logo limpio para correos (CDN; evita cold start de Render). */
 export function getEmailLogoUrl() {
-  return "https://cdn.jsdelivr.net/gh/diazdiegok/Eternity@e592c6f961babc83271b6ff206285fc59fc9552a/public/email-logo.png";
+  return "https://cdn.jsdelivr.net/gh/diazdiegok/Aurea@e592c6f961babc83271b6ff206285fc59fc9552a/public/email-logo.png";
 }

@@ -1,8 +1,8 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const COOKIE_NAME = "eternity_admin_session";
-const PENDING_COOKIE_NAME = "eternity_admin_pending";
+const COOKIE_NAME = "aurea_admin_session";
+const PENDING_COOKIE_NAME = "aurea_admin_pending";
 const SESSION_HOURS = 12;
 const PENDING_MINUTES = 5;
 

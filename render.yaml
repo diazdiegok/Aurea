@@ -1,12 +1,12 @@
 databases:
-  - name: eternity-db
+  - name: aurea-db
     plan: free
-    databaseName: eternity
-    user: eternity
+    databaseName: aurea
+    user: aurea
 
 services:
   - type: web
-    name: eternity-recuerdos
+    name: aurea-joyasadn
     runtime: node
     plan: free
     buildCommand: npm install --include=dev && npm run build
@@ -16,7 +16,7 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: eternity-db
+          name: aurea-db
           property: connectionString
       - key: ADMIN_PASSWORD
         sync: false

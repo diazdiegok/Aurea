@@ -1,4 +1,4 @@
-# Despliegue en Render — Eternity Recuerdos
+# Despliegue en Render — Aurea Joyas ADN
 
 ## ¿Cómo funciona el login admin?
 
@@ -31,7 +31,7 @@ El Web Service sigue en **Render Free**. La base de datos vive en **[Neon](https
 ### 1. Crear proyecto en Neon
 
 1. Entrá a [console.neon.tech](https://console.neon.tech) y registrate (GitHub está bien)
-2. **Create a project** → nombre `eternity` → región cercana
+2. **Create a project** → nombre `aurea` → región cercana
 3. Tocá **Connect** → copiá la connection string  
    (preferí la **directa**, sin `-pooler`, o la pooled; ambas sirven)
 4. Asegurate de que termine con `?sslmode=require`
@@ -40,6 +40,7 @@ El Web Service sigue en **Render Free**. La base de datos vive en **[Neon](https
 
 | Campo | Valor |
 |-------|--------|
+| **Name** | `aurea-joyasadn` |
 | **Build** | `npm install && npm run build` |
 | **Start** | `npm start` |
 | **Plan** | Free |
@@ -51,14 +52,14 @@ DATABASE_URL=<connection string de Neon>
 ADMIN_PASSWORD=...
 ADMIN_SECRET=...
 ADMIN_TOTP_SECRET=...
-NEXT_PUBLIC_BASE_URL=https://tu-app.onrender.com
+NEXT_PUBLIC_BASE_URL=https://aurea-joyasadn.onrender.com
 ```
 
 ### 3. Migrar datos desde Render Postgres → Neon (una vez)
 
 Si ya tenías datos en el Postgres Free de Render:
 
-1. En Render → `eternity-db` → **Connections** → copiá **External Database URL**
+1. En Render → `aurea-db` → **Connections** → copiá **External Database URL**
 2. En tu PC, en la carpeta del proyecto:
 
 ```powershell

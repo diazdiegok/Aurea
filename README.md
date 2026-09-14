@@ -1,6 +1,6 @@
-# Eternity Recuerdos — Catálogo
+# Aurea Joyas ADN — Catálogo
 
-Catálogo online para **Eternity Recuerdos** con panel de administración, carrito, checkout por WhatsApp e integración opcional con Mercado Pago.
+Catálogo online para **Aurea Joyas ADN** con panel de administración, carrito, checkout por WhatsApp e integración opcional con Mercado Pago.
 
 ## Funcionalidades
 
@@ -90,7 +90,7 @@ Detalle completo en [`DEPLOY.md`](DEPLOY.md).
 ## Contacto del negocio (configurado)
 
 - WhatsApp: `5493435001061`
-- Instagram: [eternity.recuerdos](https://www.instagram.com/eternity.recuerdos)
+- Instagram: [aurea.joyasadn](https://www.instagram.com/aurea.joyasadn)
 
 Para cambiar estos datos, editá `src/lib/config.ts`.
 

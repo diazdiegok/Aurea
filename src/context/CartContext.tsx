@@ -34,8 +34,8 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = "eternity-cart";
-const COUPON_KEY = "eternity-coupon";
+const STORAGE_KEY = "aurea-cart";
+const COUPON_KEY = "aurea-coupon";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);

@@ -53,7 +53,7 @@ export function HeroBrand() {
         <div className="relative h-full w-full">
           <Image
             src="/logo-hero.webp"
-            alt="Eternity Recuerdos"
+            alt="Aurea Joyas ADN"
             fill
             className="object-cover"
             sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, 240px"

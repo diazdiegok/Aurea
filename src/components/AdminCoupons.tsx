@@ -93,7 +93,7 @@ export function AdminCoupons() {
             <input
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
-              placeholder="EJ: ETERNITY10"
+              placeholder="EJ: AUREA10"
               className={inputClass}
               required
             />

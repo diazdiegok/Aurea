@@ -64,7 +64,7 @@ function wrapEmail(title: string, body: string) {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border:1px solid #e4d5c5;border-radius:20px;">
           <tr>
             <td style="padding:28px;text-align:center;">
-              <img src="${escapeHtml(logoUrl)}" alt="Eternity" width="140" style="display:block;margin:0 auto;width:140px;max-width:70%;height:auto;border:0;outline:none;text-decoration:none;background:#ffffff;" />
+              <img src="${escapeHtml(logoUrl)}" alt="Aurea" width="140" style="display:block;margin:0 auto;width:140px;max-width:70%;height:auto;border:0;outline:none;text-decoration:none;background:#ffffff;" />
               <p style="margin:12px 0 0;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:#a67c52;">${escapeHtml(brand)}</p>
               <h1 style="margin:16px 0 0;font-size:26px;font-weight:normal;color:#4a3b30;">${escapeHtml(title)}</h1>
               <div style="text-align:left;margin-top:8px;">${body}</div>
@@ -375,7 +375,7 @@ function thankYouClosing() {
       con dedicación, cariño y respeto por tu historia.
     </p>
     <p style="margin:14px 0 0;line-height:1.6;color:#6d5c4d;font-size:15px;">
-      Gracias por elegirnos. Esperamos que tu recuerdo Eternity te acompañe siempre.
+      Gracias por elegirnos. Esperamos que tu joya Aurea te acompañe siempre.
     </p>
     <p style="margin:18px 0 0;font-size:14px;color:#8a7b6e;font-style:italic;">
       Con cariño,<br />El equipo de ${escapeHtml(SITE.emailBrand)}
