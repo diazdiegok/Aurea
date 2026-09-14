@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { SITE } from "@/lib/config";
 import { InstagramLink } from "@/components/InstagramLink";
-import { InstagramIcon, WhatsAppIcon, DnaMark } from "@/components/Icons";
+import { InstagramIcon, WhatsAppIcon } from "@/components/Icons";
 
 export function HeroBrand() {
   const [typed, setTyped] = useState("");
@@ -86,8 +86,7 @@ export function HeroBrand() {
           <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#a67c52]">
             {SITE.tagline}
           </p>
-          <DnaMark className="mx-auto mt-3 h-3 w-32 text-[#a67c52] md:mx-0" />
-          <p className="mx-auto mt-4 max-w-md font-serif text-xl leading-snug text-[#5c4a3d] md:mx-0 md:text-2xl">
+          <p className="mx-auto mt-3 max-w-md font-serif text-xl leading-snug text-[#5c4a3d] md:mx-0 md:text-2xl">
             {SITE.manifesto}
           </p>
 

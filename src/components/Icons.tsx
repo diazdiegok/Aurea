@@ -63,31 +63,6 @@ export function SearchIcon({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-export function DnaMark({ className = "h-3 w-28" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 140 14"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M2 7 C22 1 42 13 70 7 C98 1 118 13 138 7"
-        stroke="currentColor"
-        strokeWidth="1.15"
-        strokeLinecap="round"
-      />
-      <path
-        d="M2 7 C22 13 42 1 70 7 C98 13 118 1 138 7"
-        stroke="currentColor"
-        strokeWidth="1.15"
-        strokeLinecap="round"
-        opacity="0.45"
-      />
-    </svg>
-  );
-}
-
 export function InstagramIcon({ className = "h-5 w-5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
