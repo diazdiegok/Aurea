@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { deleteMediaByUrl } from "@/lib/checkout";
+import { parsePriceARS } from "@/lib/whatsapp";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -23,12 +24,24 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     await deleteMediaByUrl(current.imageUrl);
   }
 
+  let parsedPrice: number | undefined;
+  if (body.price != null && body.price !== "") {
+    const price = parsePriceARS(body.price);
+    if (price == null) {
+      return NextResponse.json(
+        { error: "Precio inválido. Usá 290.000 para doscientos noventa mil." },
+        { status: 400 }
+      );
+    }
+    parsedPrice = price;
+  }
+
   const product = await db.product.update({
     where: { id },
     data: {
       ...(body.name != null && { name: String(body.name).trim() }),
       ...(body.description != null && { description: String(body.description).trim() }),
-      ...(body.price != null && { price: Number(body.price) }),
+      ...(parsedPrice != null && { price: parsedPrice }),
       ...(body.imageUrl !== undefined && { imageUrl: body.imageUrl || null }),
       ...(body.category != null && { category: String(body.category).trim() }),
       ...(body.featured != null && { featured: Boolean(body.featured) }),

@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatPrice } from "@/lib/whatsapp";
+import { formatPrice, formatPriceInput, parsePriceARS } from "@/lib/whatsapp";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { AdminOrders } from "@/components/AdminOrders";
 import { AdminCoupons } from "@/components/AdminCoupons";
@@ -160,7 +160,7 @@ export function AdminPanel() {
     setForm({
       name: product.name,
       description: product.description,
-      price: String(product.price),
+      price: formatPriceInput(product.price),
       category: product.category,
       featured: product.featured,
       active: product.active,
@@ -187,13 +187,19 @@ export function AdminPanel() {
       return;
     }
 
+    const price = parsePriceARS(form.price);
+    if (price == null) {
+      setMessage("Ingresá un precio válido, por ejemplo 290.000");
+      return;
+    }
+
     setSaving(true);
     setMessage("");
 
     const payload = {
       ...form,
       category,
-      price: Number(form.price),
+      price,
     };
 
     const res = await fetch(
@@ -419,14 +425,28 @@ export function AdminPanel() {
           <label className="block text-sm font-medium text-[#5c4a3d]">
             Precio (ARS) *
             <input
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
+              placeholder="290.000"
               value={form.price}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  price: e.target.value.replace(/[^\d.,]/g, ""),
+                })
+              }
+              onBlur={() => {
+                const parsed = parsePriceARS(form.price);
+                if (parsed != null) {
+                  setForm((f) => ({ ...f, price: formatPriceInput(parsed) }));
+                }
+              }}
               className={inputClass}
               required
             />
+            <span className="mt-1 block text-xs font-normal text-[#9a8b7e]">
+              El punto es para miles: 290.000 = doscientos noventa mil.
+            </span>
           </label>
           <label className="block text-sm font-medium text-[#5c4a3d] sm:col-span-2">
             Descripción

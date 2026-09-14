@@ -16,6 +16,67 @@ export function formatPrice(amount: number) {
   }).format(amount);
 }
 
+/** 290000 → "290.000" (formato admin, miles con punto). */
+export function formatPriceInput(amount: number) {
+  return new Intl.NumberFormat("es-AR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Math.round(amount));
+}
+
+/**
+ * Lee un precio en formato argentino.
+ * 290.000 → 290000, 1.250.000 → 1250000, 290,50 → 291 (se redondea al peso).
+ */
+export function parsePriceARS(raw: unknown): number | null {
+  if (typeof raw === "number") {
+    if (!Number.isFinite(raw) || raw < 0) return null;
+    return Math.round(raw);
+  }
+  if (raw == null) return null;
+
+  const text = String(raw)
+    .trim()
+    .replace(/\$/g, "")
+    .replace(/\s/g, "")
+    .replace(/ARS/gi, "");
+  if (!text) return null;
+  if (/[^0-9.,]/.test(text)) return null;
+
+  let normalized = text;
+  const hasComma = text.includes(",");
+  const hasDot = text.includes(".");
+
+  if (hasComma && hasDot) {
+    const lastComma = text.lastIndexOf(",");
+    const lastDot = text.lastIndexOf(".");
+    normalized =
+      lastComma > lastDot
+        ? text.replace(/\./g, "").replace(",", ".")
+        : text.replace(/,/g, "");
+  } else if (hasComma) {
+    const parts = text.split(",");
+    if (parts.length > 2) {
+      normalized = text.replace(/,/g, "");
+    } else if (parts[1]?.length === 3 && parts[0] !== "0") {
+      normalized = parts[0] + parts[1];
+    } else {
+      normalized = text.replace(",", ".");
+    }
+  } else if (hasDot) {
+    const parts = text.split(".");
+    if (parts.length > 2) {
+      normalized = text.replace(/\./g, "");
+    } else if (parts[1]?.length === 3 && parts[0] !== "" && parts[0] !== "0") {
+      normalized = parts[0] + parts[1];
+    }
+  }
+
+  const value = Number(normalized);
+  if (!Number.isFinite(value) || value < 0) return null;
+  return Math.round(value);
+}
+
 type WhatsAppOrderOptions = {
   items: CartItem[];
   note?: string;
