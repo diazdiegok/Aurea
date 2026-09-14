@@ -4,7 +4,7 @@ export const SITE = {
   /** Nombre que aparece en correos al cliente */
   emailBrand: "Aurea Joyas ADN",
   contactEmail: "aureajoyasadn@gmail.com",
-  tagline: "Joyas de leche materna",
+  tagline: "Joyas ADN",
   subtitle: "Accesorios y box personalizados",
   whatsapp: "5493435001061",
   instagram: "https://www.instagram.com/aurea.joyasadn",

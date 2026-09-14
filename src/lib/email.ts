@@ -69,7 +69,7 @@ function wrapEmail(title: string, body: string) {
               <h1 style="margin:16px 0 0;font-size:26px;font-weight:normal;color:#4a3b30;">${escapeHtml(title)}</h1>
               <div style="text-align:left;margin-top:8px;">${body}</div>
               <p style="margin:28px 0 0;font-size:12px;color:#8a7b6e;text-align:center;">
-                ${escapeHtml(brand)} · Joyas de leche materna
+                ${escapeHtml(brand)} · Joyas ADN
               </p>
             </td>
           </tr>

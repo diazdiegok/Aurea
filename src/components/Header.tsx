@@ -25,7 +25,7 @@ export function Header() {
             {SITE.name}
           </p>
           <p className="text-[10px] uppercase tracking-[0.18em] text-[#a67c52]">
-            Joyas de leche materna
+            {SITE.tagline}
           </p>
         </Link>
 

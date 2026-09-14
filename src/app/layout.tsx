@@ -20,7 +20,7 @@ const sans = DM_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseUrl()),
-  title: `${SITE.brandFull} | Joyas de leche materna`,
+  title: `${SITE.brandFull} | ${SITE.tagline}`,
   description: `${SITE.tagline}. ${SITE.subtitle}`,
   openGraph: {
     title: SITE.brandFull,

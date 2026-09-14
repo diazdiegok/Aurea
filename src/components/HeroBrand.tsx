@@ -46,7 +46,7 @@ export function HeroBrand() {
   return (
     <div className="relative mx-auto grid max-w-5xl items-center gap-7 px-5 py-12 sm:gap-10 sm:px-6 sm:py-16 md:grid-cols-[auto_1fr] md:py-20">
       <div
-        className={`mx-auto h-40 w-40 overflow-hidden rounded-full bg-[#f7f1ea] shadow-[0_22px_50px_-20px_rgba(74,59,48,0.5)] ring-1 ring-[#d4b896]/55 sm:h-52 sm:w-52 md:mx-0 md:h-60 md:w-60 ${
+        className={`mx-auto h-52 w-52 overflow-hidden rounded-full bg-[#faf6f1] shadow-[0_22px_50px_-20px_rgba(74,59,48,0.5)] ring-1 ring-[#d4b896]/55 sm:h-64 sm:w-64 md:mx-0 md:h-72 md:w-72 ${
           reduceMotion ? "" : "animate-logo-drop"
         }`}
       >
@@ -55,8 +55,8 @@ export function HeroBrand() {
             src="/logo-hero.webp"
             alt="Aurea Joyas ADN"
             fill
-            className="object-cover"
-            sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, 240px"
+            className="object-contain p-1"
+            sizes="(max-width: 640px) 208px, (max-width: 768px) 256px, 288px"
             priority
             unoptimized
           />
