@@ -91,6 +91,7 @@ Detalle completo en [`DEPLOY.md`](DEPLOY.md).
 
 - WhatsApp: `5493435001061`
 - Instagram: [aurea.joyasadn](https://www.instagram.com/aurea.joyasadn)
+- Email: `aureajoyasadn@gmail.com`
 
 Para cambiar estos datos, editá `src/lib/config.ts`.
 

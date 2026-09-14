@@ -3,6 +3,7 @@ export const SITE = {
   brandFull: "Aurea Joyas ADN",
   /** Nombre que aparece en correos al cliente */
   emailBrand: "Aurea Joyas ADN",
+  contactEmail: "aureajoyasadn@gmail.com",
   tagline: "Joyas de leche materna",
   subtitle: "Accesorios y box personalizados",
   whatsapp: "5493435001061",
@@ -21,7 +22,7 @@ export const SITE = {
 } as const;
 
 /** URL pública de producción (fallback si falta env en Render) */
-export const PRODUCTION_BASE_URL = "https://aurea.onrender.com";
+export const PRODUCTION_BASE_URL = "https://aurea-lsyq.onrender.com";
 
 export function getBaseUrl() {
   const fromEnv = (

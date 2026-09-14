@@ -563,7 +563,7 @@ export function CartDrawer() {
               onClick={() => {
                 if (!mpEnabled) {
                   setNotice(
-                    "Mercado Pago aún no está activo. En Render agregá MP_ACCESS_TOKEN (Access Token de tu app Checkout Pro) y NEXT_PUBLIC_BASE_URL=https://aurea.onrender.com, después redeploy."
+                    "Mercado Pago aún no está activo. En Render agregá MP_ACCESS_TOKEN (Access Token de tu app Checkout Pro) y NEXT_PUBLIC_BASE_URL=https://aurea-lsyq.onrender.com, después redeploy."
                   );
                   return;
                 }

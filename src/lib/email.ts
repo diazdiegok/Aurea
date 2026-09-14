@@ -95,7 +95,7 @@ function parseFrom(raw?: string | null) {
   }
   return {
     name: SITE.emailBrand,
-    email: process.env.SMTP_USER?.trim() || "onboarding@resend.dev",
+    email: process.env.SMTP_USER?.trim() || SITE.contactEmail,
   };
 }
 
@@ -159,7 +159,7 @@ async function sendViaResend(
   const apiKey = process.env.RESEND_API_KEY!.trim();
   const from =
     process.env.EMAIL_FROM?.trim() ||
-    `${SITE.emailBrand} <onboarding@resend.dev>`;
+    `${SITE.emailBrand} <${SITE.contactEmail}>`;
   const replyTo = process.env.SMTP_USER?.trim() || undefined;
 
   const resend = new Resend(apiKey);
