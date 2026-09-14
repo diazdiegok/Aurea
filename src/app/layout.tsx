@@ -21,10 +21,10 @@ const sans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseUrl()),
   title: SITE.brandFull,
-  description: SITE.subtitle,
+  description: SITE.manifesto,
   openGraph: {
     title: SITE.brandFull,
-    description: SITE.subtitle,
+    description: SITE.manifesto,
     images: ["/logo.webp"],
   },
   other: {

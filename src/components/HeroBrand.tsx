@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { SITE } from "@/lib/config";
 import { InstagramLink } from "@/components/InstagramLink";
-import { InstagramIcon, WhatsAppIcon } from "@/components/Icons";
+import { InstagramIcon, WhatsAppIcon, DnaMark } from "@/components/Icons";
 
 export function HeroBrand() {
   const [typed, setTyped] = useState("");
@@ -83,9 +83,12 @@ export function HeroBrand() {
             showRest ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
           }`}
         >
-          <p className="mt-4 text-base text-[#6d5c4d] sm:text-lg">{SITE.tagline}</p>
-          <p className="mx-auto mt-2 max-w-md text-sm text-[#8a7b6e] md:mx-0">
-            Piezas únicas hechas con amor para guardar un recuerdo eterno.
+          <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#a67c52]">
+            {SITE.tagline}
+          </p>
+          <DnaMark className="mx-auto mt-3 h-3 w-32 text-[#a67c52] md:mx-0" />
+          <p className="mx-auto mt-4 max-w-md font-serif text-xl leading-snug text-[#5c4a3d] md:mx-0 md:text-2xl">
+            {SITE.manifesto}
           </p>
 
           <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:justify-center md:justify-start">

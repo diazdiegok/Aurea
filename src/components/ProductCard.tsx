@@ -19,7 +19,13 @@ type Product = {
   promotionEndsAt?: string | null;
 };
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({
+  product,
+  variant = "catalog",
+}: {
+  product: Product;
+  variant?: "catalog" | "lookbook";
+}) {
   const { addItem } = useCart();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [added, setAdded] = useState(false);
@@ -41,10 +47,22 @@ export function ProductCard({ product }: { product: Product }) {
     window.setTimeout(() => setAdded(false), 900);
   }
 
+  const lookbook = variant === "lookbook";
+
   return (
     <>
-      <article className="product-card group flex h-full flex-col overflow-hidden rounded-[1.35rem] bg-white shadow-[0_10px_30px_-18px_rgba(74,59,48,0.35)] ring-1 ring-[#e4d5c5]/80">
-        <div className="relative aspect-[5/4] shrink-0 overflow-hidden bg-[#efe4d8] sm:aspect-square">
+      <article
+        className={`product-card group overflow-hidden rounded-[1.35rem] bg-white shadow-[0_10px_30px_-18px_rgba(74,59,48,0.35)] ring-1 ring-[#e4d5c5]/80 ${
+          lookbook ? "md:grid md:grid-cols-2" : "flex h-full flex-col"
+        }`}
+      >
+        <div
+          className={`relative shrink-0 overflow-hidden bg-[#efe4d8] ${
+            lookbook
+              ? "aspect-[4/5] md:aspect-auto md:min-h-[28rem]"
+              : "aspect-[5/4] sm:aspect-square"
+          }`}
+        >
           {product.imageUrl ? (
             <button
               type="button"
@@ -58,7 +76,11 @@ export function ProductCard({ product }: { product: Product }) {
                 fill
                 quality={100}
                 className="object-cover object-center"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                sizes={
+                  lookbook
+                    ? "(max-width: 768px) 100vw, 50vw"
+                    : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                }
                 unoptimized
               />
               <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#4a3b30]/40 to-transparent p-3 sm:p-4 sm:opacity-0 sm:transition sm:duration-300 sm:group-hover:opacity-100">
@@ -75,11 +97,11 @@ export function ProductCard({ product }: { product: Product }) {
 
           <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5">
             {onSale && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#c45c26] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow-sm">
-                <span aria-hidden>🔥</span> HOT −{product.promotionPercent}%
+              <span className="inline-flex items-center rounded-full bg-[#4a3b30]/90 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-[#f7f1ea] backdrop-blur-sm">
+                −{product.promotionPercent}%
               </span>
             )}
-            {product.featured && (
+            {product.featured && !lookbook && (
               <span className="rounded-full bg-[#4a3b30]/90 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-[#f7f1ea] backdrop-blur-sm">
                 Destacado
               </span>
@@ -87,20 +109,34 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-3 px-4 py-4 sm:px-5 sm:py-5">
+        <div
+          className={`flex flex-1 flex-col gap-3 ${
+            lookbook
+              ? "justify-center px-6 py-7 sm:px-10 sm:py-12"
+              : "px-4 py-4 sm:px-5 sm:py-5"
+          }`}
+        >
           <div className="flex-1">
             <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#a67c52]">
-              {product.category}
+              {lookbook ? "Pieza de la casa" : product.category}
             </p>
-            <h3 className="mt-1.5 font-serif text-[1.35rem] leading-tight text-[#4a3b30] sm:text-xl">
+            <h3
+              className={`mt-1.5 font-serif leading-tight text-[#4a3b30] ${
+                lookbook ? "text-3xl sm:text-4xl" : "text-[1.35rem] sm:text-xl"
+              }`}
+            >
               {product.name}
             </h3>
             {product.description ? (
-              <p className="mt-2 line-clamp-2 min-h-[2.75rem] text-sm leading-relaxed text-[#6d5c4d]">
+              <p
+                className={`mt-2 text-sm leading-relaxed text-[#6d5c4d] ${
+                  lookbook ? "line-clamp-4 max-w-md" : "line-clamp-2 min-h-[2.75rem]"
+                }`}
+              >
                 {product.description}
               </p>
             ) : (
-              <p className="mt-2 min-h-[2.75rem]" aria-hidden />
+              !lookbook && <p className="mt-2 min-h-[2.75rem]" aria-hidden />
             )}
           </div>
 

@@ -80,6 +80,14 @@ export function CatalogPage() {
     return ranked;
   }, [products, category, query, sort]);
 
+  const lookbookPiece =
+    !query.trim() && category === "Todos" && sort === "featured"
+      ? filtered.find((p) => p.featured) ?? null
+      : null;
+  const gridProducts = lookbookPiece
+    ? filtered.filter((p) => p.id !== lookbookPiece.id)
+    : filtered;
+
   return (
     <main>
       <section className="relative overflow-hidden border-b border-[#e4d5c5] bg-[linear-gradient(165deg,#f3e8dc_0%,#f7f1ea_48%,#efe4d8_100%)]">
@@ -99,14 +107,14 @@ export function CatalogPage() {
       <section className="mx-auto max-w-6xl px-0 pb-16 pt-0 sm:px-6 sm:pb-20 sm:pt-2">
         <Reveal className="px-5 pb-1 pt-8 text-center sm:px-0 sm:pt-10">
           <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-[#a67c52]">
-            Colección
+            El taller
           </p>
           <h2 className="mt-2 font-serif text-3xl text-[#4a3b30] sm:text-4xl">
-            Nuestras piezas
+            Piezas con historia
           </h2>
         </Reveal>
 
-        <div className="sticky top-[61px] z-30 border-b border-[#e4d5c5]/80 bg-[#f7f1ea]/95 backdrop-blur-md sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-none">
+        <div className="sticky top-[56px] z-30 border-b border-[#e4d5c5]/80 bg-[#f7f1ea]/95 backdrop-blur-md sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-none">
           <div className="mx-auto flex max-w-2xl flex-col gap-3 px-5 py-3.5 sm:px-0 sm:py-6">
             <label className="relative block">
               <span className="sr-only">Buscar piezas</span>
@@ -181,19 +189,25 @@ export function CatalogPage() {
               )}
             </div>
           ) : (
-            <div
-              key={`${category}-${sort}-${query}`}
-              className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7"
-            >
-              {filtered.map((product, index) => (
-                <Reveal
-                  key={product.id}
-                  className="h-full"
-                  delay={Math.min(index % 3, 2) * 40}
-                >
-                  <ProductCard product={product} />
+            <div key={`${category}-${sort}-${query}`} className="space-y-5 sm:space-y-7">
+              {lookbookPiece && (
+                <Reveal>
+                  <ProductCard product={lookbookPiece} variant="lookbook" />
                 </Reveal>
-              ))}
+              )}
+              {gridProducts.length > 0 && (
+                <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7">
+                  {gridProducts.map((product, index) => (
+                    <Reveal
+                      key={product.id}
+                      className="h-full"
+                      delay={Math.min(index % 3, 2) * 40}
+                    >
+                      <ProductCard product={product} />
+                    </Reveal>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

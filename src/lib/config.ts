@@ -6,6 +6,7 @@ export const SITE = {
   contactEmail: "aureajoyasadn@gmail.com",
   tagline: "Joyas ADN",
   subtitle: "Accesorios y box personalizados",
+  manifesto: "Cada pieza lleva una historia. Hecha para quedarse en tu gente.",
   whatsapp: "5493435001061",
   instagramHandle: "aurea.joyasadn",
   instagram: "https://www.instagram.com/aurea.joyasadn",
