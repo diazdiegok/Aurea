@@ -19,11 +19,18 @@ type Product = {
   promotionEndsAt?: string | null;
 };
 
-const CATEGORY_ORDER = ["Plata 925", "18k", "Sin Bordes", "Bordes de Acero", "Mascotas"];
-const PINNED_CATEGORIES = ["Plata 925", "18k"];
+const CATEGORY_ORDER = ["Plata 925", "ORO 18K", "Sin Bordes", "Bordes de Acero", "Mascotas"];
+const PINNED_CATEGORIES = ["Plata 925", "ORO 18K"];
+
+function categoryKey(value: string) {
+  const n = value.trim().toLowerCase().replace(/\s+/g, " ");
+  if (n === "18k" || n === "oro 18k" || n === "oro18k") return "oro 18k";
+  if (n === "plata 925" || n === "plata925") return "plata 925";
+  return n;
+}
 
 function sameCategory(a: string, b: string) {
-  return a.trim().toLowerCase() === b.trim().toLowerCase();
+  return categoryKey(a) === categoryKey(b);
 }
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "name";
@@ -52,9 +59,10 @@ export function CatalogPage() {
 
   const categories = useMemo(() => {
     const unique = [...new Set(products.map((p) => p.category).filter(Boolean))];
-    const labels = PINNED_CATEGORIES.map(
-      (pinned) => unique.find((c) => sameCategory(c, pinned)) ?? pinned
-    );
+    const labels = PINNED_CATEGORIES.map((pinned) => {
+      if (sameCategory(pinned, "ORO 18K")) return "ORO 18K";
+      return unique.find((c) => sameCategory(c, pinned)) ?? pinned;
+    });
     const extra = unique.filter(
       (c) => !labels.some((label) => sameCategory(label, c))
     );
