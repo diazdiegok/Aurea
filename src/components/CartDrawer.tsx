@@ -34,12 +34,11 @@ export function CartDrawer() {
   const [couponInput, setCouponInput] = useState("");
   const [couponMsg, setCouponMsg] = useState("");
   const [applyingCoupon, setApplyingCoupon] = useState(false);
-  const [mpEnabled, setMpEnabled] = useState(false);
-  const [loadingMp, setLoadingMp] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [completedCode, setCompletedCode] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
+  const [checkoutChannel, setCheckoutChannel] = useState<"whatsapp" | "transfer" | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -48,13 +47,6 @@ export function CartDrawer() {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [showTransfer, setShowTransfer] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/checkout/mercadopago")
-      .then((r) => r.json())
-      .then((data) => setMpEnabled(Boolean(data.enabled)))
-      .catch(() => setMpEnabled(false));
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -66,12 +58,12 @@ export function CartDrawer() {
   }, [isOpen]);
 
   useEffect(() => {
-    if (!whatsappUrl || !completedCode) return;
+    if (!whatsappUrl || !completedCode || checkoutChannel === "transfer") return;
     const t = window.setTimeout(() => {
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     }, 1800);
     return () => window.clearTimeout(t);
-  }, [whatsappUrl, completedCode]);
+  }, [whatsappUrl, completedCode, checkoutChannel]);
 
   if (!isOpen) return null;
 
@@ -90,6 +82,7 @@ export function CartDrawer() {
     setCompletedCode(null);
     setEmailSent(null);
     setWhatsappUrl(null);
+    setCheckoutChannel(null);
     closeCart();
   }
 
@@ -156,53 +149,7 @@ export function CartDrawer() {
     discountPercent: coupon?.percentOff || 0,
   });
 
-  async function handleMercadoPago() {
-    if (!validateCheckout()) return;
-    setLoadingMp(true);
-    try {
-      const res = await fetch("/api/checkout/mercadopago", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderPayload()),
-      });
-      const data = await res.json();
-      if (data.checkoutUrl) {
-        try {
-          sessionStorage.setItem(
-            "aurea-mp-order",
-            JSON.stringify({
-              code: data.orderCode,
-              items,
-              note,
-              customerName: customerName.trim(),
-              customerPhone: getCustomerPhoneDisplay(),
-              email: email.trim(),
-              coupon: coupon
-                ? {
-                    code: coupon.code,
-                    percentOff: coupon.percentOff,
-                    amount: discountAmount,
-                  }
-                : null,
-            })
-          );
-        } catch {
-          /* ignore */
-        }
-        clearCart();
-        resetCheckoutFields();
-        window.location.href = data.checkoutUrl;
-        return;
-      }
-      setNotice(data.error || "Error al iniciar el pago");
-    } catch {
-      setNotice("Error al conectar con Mercado Pago");
-    } finally {
-      setLoadingMp(false);
-    }
-  }
-
-  async function handleConfirmOrder() {
+  async function handleConfirmOrder(channel: "whatsapp" | "transfer" = "whatsapp") {
     if (submitting || items.length === 0) return;
     if (!validateCheckout()) return;
     setSubmitting(true);
@@ -230,7 +177,7 @@ export function CartDrawer() {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...orderPayload(), channel: "whatsapp" }),
+        body: JSON.stringify({ ...orderPayload(), channel }),
         signal: controller.signal,
       });
       window.clearTimeout(timeout);
@@ -261,6 +208,7 @@ export function CartDrawer() {
       discount: couponSnapshot,
       orderCode,
       paid: false,
+      transfer: channel === "transfer",
       customerName: nameSnapshot,
       customerPhone: phoneDisplay,
       customerEmail: emailSnapshot,
@@ -271,7 +219,9 @@ export function CartDrawer() {
     resetCheckoutFields();
     setEmailSent(sent);
     setWhatsappUrl(url);
+    setCheckoutChannel(channel);
     setCompletedCode(orderCode || "registrado");
+    if (channel === "transfer") setShowTransfer(false);
   }
 
   async function copyTransferValue(label: string, value: string) {
@@ -357,9 +307,11 @@ export function CartDrawer() {
                   </p>
                 )}
                 <p className="mt-4 text-sm text-[#8a7b6e]">
-                  {emailSent
-                    ? "Te enviamos el detalle al correo. Se abre WhatsApp para avisar al negocio."
-                    : "Pedido guardado. Se abre WhatsApp para avisar al negocio."}
+                  {checkoutChannel === "transfer"
+                    ? "Te enviamos el pedido por correo. Transferí al alias y avisá por WhatsApp con el comprobante."
+                    : emailSent
+                      ? "Te enviamos el detalle al correo. Se abre WhatsApp para avisar al negocio."
+                      : "Pedido guardado. Se abre WhatsApp para avisar al negocio."}
                 </p>
               </div>
               <div className="flex w-full flex-col gap-2">
@@ -560,25 +512,8 @@ export function CartDrawer() {
 
             <button
               type="button"
-              onClick={() => {
-                if (!mpEnabled) {
-                  setNotice(
-                    "Mercado Pago aún no está activo. En Render agregá MP_ACCESS_TOKEN (Access Token de tu app Checkout Pro) y NEXT_PUBLIC_BASE_URL=https://aurea-isyq.onrender.com, después redeploy."
-                  );
-                  return;
-                }
-                handleMercadoPago();
-              }}
-              disabled={loadingMp || submitting}
-              className="btn-press w-full rounded-full bg-[#009ee3] py-3.5 font-medium text-white shadow-[0_12px_28px_-14px_rgba(0,158,227,0.7)] transition hover:bg-[#008bd0] disabled:opacity-60"
-            >
-              {loadingMp ? "Redirigiendo..." : "Pagar con Mercado Pago"}
-            </button>
-
-            <button
-              type="button"
               onClick={() => setShowTransfer(true)}
-              disabled={loadingMp || submitting}
+              disabled={submitting}
               className="btn-press w-full rounded-full bg-[#2f6f5e] py-3.5 font-medium text-white shadow-[0_12px_28px_-14px_rgba(47,111,94,0.7)] transition hover:bg-[#265a4c] disabled:opacity-60"
             >
               Transferencia
@@ -586,11 +521,11 @@ export function CartDrawer() {
 
             <button
               type="button"
-              onClick={handleConfirmOrder}
-              disabled={submitting || loadingMp}
+              onClick={() => handleConfirmOrder("whatsapp")}
+              disabled={submitting}
               className="btn-press w-full rounded-full bg-[#4a3b30] py-3.5 font-medium text-white hover:bg-[#5c4a3d] disabled:opacity-60"
             >
-              {submitting ? "Registrando..." : "Confirmar pedido"}
+              {submitting ? "Registrando..." : "Confirmar por WhatsApp"}
             </button>
               </div>
             </div>
@@ -667,16 +602,24 @@ export function CartDrawer() {
             </ul>
 
             <p className="mt-4 text-sm text-[#6d5c4d]">
-              Transferí el total ({formatPrice(total)}) y después tocá{" "}
-              <strong>Confirmar pedido</strong> para registrarlo.
+              Transferí el total ({formatPrice(total)}) a estos datos. Después
+              confirmá el pedido para que quede registrado.
             </p>
 
             <button
               type="button"
-              onClick={() => setShowTransfer(false)}
-              className="mt-4 w-full rounded-full bg-[#4a3b30] px-4 py-3 text-sm font-medium text-white"
+              onClick={() => handleConfirmOrder("transfer")}
+              disabled={submitting}
+              className="mt-4 w-full rounded-full bg-[#2f6f5e] px-4 py-3 text-sm font-medium text-white disabled:opacity-60"
             >
-              Entendido
+              {submitting ? "Registrando..." : "Ya transferí · confirmar pedido"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowTransfer(false)}
+              className="mt-2 w-full rounded-full border border-[#e4d5c5] bg-white px-4 py-3 text-sm text-[#5c4a3d]"
+            >
+              Volver
             </button>
           </div>
         </div>

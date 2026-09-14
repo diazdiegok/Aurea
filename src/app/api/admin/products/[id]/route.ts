@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { deleteMediaByUrl } from "@/lib/checkout";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -11,6 +12,16 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
   const { id } = await context.params;
   const body = await request.json();
+  const current = await db.product.findUnique({ where: { id } });
+  if (!current) {
+    return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+  }
+
+  const nextImage =
+    body.imageUrl !== undefined ? body.imageUrl || null : current.imageUrl;
+  if (nextImage !== current.imageUrl) {
+    await deleteMediaByUrl(current.imageUrl);
+  }
 
   const product = await db.product.update({
     where: { id },
@@ -34,6 +45,10 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
   }
 
   const { id } = await context.params;
+  const current = await db.product.findUnique({ where: { id } });
+  if (current) {
+    await deleteMediaByUrl(current.imageUrl);
+  }
   await db.product.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }

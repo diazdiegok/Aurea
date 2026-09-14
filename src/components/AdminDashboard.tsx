@@ -24,6 +24,7 @@ type DashboardData = {
     pending: number;
     byChannel: {
       whatsapp: ChannelStat;
+      transfer: ChannelStat;
       mercadopago: ChannelStat;
       manual: ChannelStat;
     };
@@ -52,6 +53,7 @@ type DashboardData = {
 
 const channelLabel: Record<string, string> = {
   whatsapp: "WEB",
+  transfer: "Transfer",
   mercadopago: "MP",
   manual: "Manual",
 };

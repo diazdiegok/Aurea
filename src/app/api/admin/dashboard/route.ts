@@ -52,7 +52,7 @@ export async function GET() {
   const ordersToday = counted.filter((o) => o.createdAt >= today).length;
   const avgTicket = ordersMonth > 0 ? Math.round(revenueMonth / ordersMonth) : 0;
 
-  const channelKeys = ["whatsapp", "mercadopago", "manual"] as const;
+  const channelKeys = ["whatsapp", "transfer", "mercadopago", "manual"] as const;
   const byChannel = Object.fromEntries(
     channelKeys.map((key) => {
       const rows = counted.filter((o) => o.channel === key);

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import type { CartItem } from "@/lib/whatsapp";
 
-export type OrderChannel = "whatsapp" | "mercadopago" | "manual";
+export type OrderChannel = "whatsapp" | "transfer" | "mercadopago" | "manual";
 export type OrderStatus = "pending" | "completed" | "cancelled";
 
 export const ORDER_STATUSES: { value: OrderStatus; label: string }[] = [
@@ -15,7 +15,7 @@ export const COUNTED_STATUSES = ["completed", "confirmed", "paid"] as const;
 
 function makeCode() {
   const n = Math.floor(1000 + Math.random() * 9000);
-  return `ET-${n}`;
+  return `AU-${n}`;
 }
 
 export function normalizeOrderStatus(status: string): OrderStatus {
@@ -56,7 +56,7 @@ export async function createOrder(input: {
   const total = Math.max(0, subtotal - discountAmount);
 
   let code = makeCode();
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 12; i++) {
     const exists = await db.order.findUnique({ where: { code } });
     if (!exists) break;
     code = makeCode();

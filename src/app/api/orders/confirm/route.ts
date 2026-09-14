@@ -1,22 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const orderId = body.orderId ? String(body.orderId) : "";
-  const status = "completed";
-
-  if (!orderId) {
-    return NextResponse.json({ error: "orderId requerido" }, { status: 400 });
-  }
-
-  try {
-    const order = await db.order.update({
-      where: { id: orderId },
-      data: { status },
-    });
-    return NextResponse.json({ ok: true, code: order.code, status: order.status });
-  } catch {
-    return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 });
-  }
+export async function POST() {
+  return NextResponse.json(
+    { error: "Mercado Pago no está disponible" },
+    { status: 410 }
+  );
 }

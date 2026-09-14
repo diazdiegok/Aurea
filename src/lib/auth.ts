@@ -1,5 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { timingSafeEqual } from "crypto";
+import bcrypt from "bcryptjs";
 
 const COOKIE_NAME = "aurea_admin_session";
 const PENDING_COOKIE_NAME = "aurea_admin_pending";
@@ -7,8 +9,12 @@ const SESSION_HOURS = 12;
 const PENDING_MINUTES = 5;
 
 function getSecret() {
-  const secret = process.env.ADMIN_SECRET || process.env.ADMIN_PASSWORD || "cambiar-en-produccion";
-  return new TextEncoder().encode(secret);
+  const secret = process.env.ADMIN_SECRET;
+  if (secret) return new TextEncoder().encode(secret);
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("ADMIN_SECRET es obligatorio en producción");
+  }
+  return new TextEncoder().encode("aurea-dev-secret");
 }
 
 export async function createAdminSession() {
@@ -82,7 +88,32 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   }
 }
 
-export function verifyAdminPassword(password: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD || "admin123";
-  return password === expected;
+export async function verifyAdminPassword(password: string): Promise<boolean> {
+  const expected = process.env.ADMIN_PASSWORD || "";
+  if (!password || !expected) return false;
+
+  if (expected.startsWith("$2a$") || expected.startsWith("$2b$") || expected.startsWith("$2y$")) {
+    return bcrypt.compare(password, expected);
+  }
+
+  const a = Buffer.from(password);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+
+export function consumeLoginAttempt(ip: string) {
+  const now = Date.now();
+  const current = loginAttempts.get(ip);
+  if (!current || current.resetAt < now) {
+    loginAttempts.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 });
+    return { ok: true as const };
+  }
+  if (current.count >= 8) {
+    return { ok: false as const, retryAt: current.resetAt };
+  }
+  current.count += 1;
+  return { ok: true as const };
 }

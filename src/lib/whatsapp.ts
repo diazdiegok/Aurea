@@ -21,8 +21,8 @@ type WhatsAppOrderOptions = {
   note?: string;
   discount?: { code: string; percentOff: number; amount: number } | null;
   orderCode?: string | null;
-  /** Pedido registrado (transferencia/comprobante) vs ya pagado con MP */
   paid?: boolean;
+  transfer?: boolean;
   customerName?: string | null;
   customerPhone?: string | null;
   customerEmail?: string | null;
@@ -35,6 +35,7 @@ export function buildWhatsAppUrl(options: WhatsAppOrderOptions) {
     discount,
     orderCode,
     paid = false,
+    transfer = false,
     customerName,
     customerPhone,
     customerEmail,
@@ -47,6 +48,14 @@ export function buildWhatsAppUrl(options: WhatsAppOrderOptions) {
 
   if (paid) {
     lines.push(`Hola! Acabo de *pagar* un pedido en *${brand}*.`, "");
+  } else if (transfer) {
+    lines.push(
+      `Hola! Realicé un *pedido por transferencia* en *${brand}*.`,
+      "",
+      `Alias: ${SITE.transfer.alias}`,
+      `Total a transferir: *${formatPrice(total)}*`,
+      ""
+    );
   } else {
     lines.push(`Hola! Realicé un *pedido* en *${brand}*.`, "");
   }

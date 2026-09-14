@@ -12,7 +12,7 @@ export async function GET() {
   const orders = await db.order.findMany({
     include: { items: true },
     orderBy: { createdAt: "desc" },
-    take: 100,
+    take: 500,
   });
 
   return NextResponse.json(orders);

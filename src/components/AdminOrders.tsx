@@ -55,6 +55,7 @@ const STATUSES = [
 
 const channelLabel: Record<string, string> = {
   whatsapp: "WEB",
+  transfer: "Transfer",
   mercadopago: "MP",
   manual: "Manual",
 };
@@ -125,7 +126,9 @@ export function AdminOrders({ products }: { products: Product[] }) {
   const filtered = useMemo(() => {
     if (filter === "all") return orders;
     if (filter === "web") {
-      return orders.filter((o) => o.channel === "whatsapp");
+      return orders.filter(
+        (o) => o.channel === "whatsapp" || o.channel === "transfer"
+      );
     }
     return orders.filter((o) => o.status === filter || o.channel === filter);
   }, [orders, filter]);
@@ -448,8 +451,8 @@ export function AdminOrders({ products }: { products: Product[] }) {
               ["all", "Todos"],
               ["manual", "Manual"],
               ["web", "WEB"],
+              ["transfer", "Transfer"],
               ["pending", "Pendientes"],
-              ["mercadopago", "MP"],
             ].map(([value, label]) => (
               <button
                 key={value}

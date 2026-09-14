@@ -303,9 +303,11 @@ export async function sendNewOrderNotifyEmail(
   const channelLabel =
     order.channel === "mercadopago"
       ? "Mercado Pago"
-      : order.channel === "whatsapp"
-        ? "Web / transferencia"
-        : order.channel || "Web";
+      : order.channel === "transfer"
+        ? "Transferencia"
+        : order.channel === "whatsapp"
+          ? "Web / WhatsApp"
+          : order.channel || "Web";
 
   const body = `
     <p style="margin:16px 0;line-height:1.6;color:#6d5c4d;font-size:15px;">

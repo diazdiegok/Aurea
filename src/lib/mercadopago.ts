@@ -11,10 +11,7 @@ function getClient() {
 }
 
 export function isMercadoPagoEnabled() {
-  return Boolean(
-    process.env.MP_ACCESS_TOKEN?.trim() ||
-      process.env.MERCADOPAGO_ACCESS_TOKEN?.trim()
-  );
+  return false;
 }
 
 export async function createCheckoutPreference(
