@@ -122,7 +122,7 @@ export function CatalogPage() {
       <section className="mx-auto max-w-6xl px-0 pb-16 pt-0 sm:px-6 sm:pb-20 sm:pt-2">
         <Reveal className="px-5 pb-1 pt-8 text-center sm:px-0 sm:pt-10">
           <h2 className="font-serif text-3xl text-[#4a3b30] sm:text-4xl">
-            Piezas
+            Nuestras piezas
           </h2>
         </Reveal>
 
