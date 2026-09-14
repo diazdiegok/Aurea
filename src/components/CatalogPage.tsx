@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { Reveal } from "@/components/Reveal";
 import { HeroBrand } from "@/components/HeroBrand";
+import { SearchIcon } from "@/components/Icons";
 
 type Product = {
   id: string;
@@ -20,10 +21,22 @@ type Product = {
 
 const CATEGORY_ORDER = ["Sin Bordes", "Bordes de Acero", "Plata 925", "Mascotas"];
 
+type SortKey = "featured" | "price-asc" | "price-desc" | "name";
+
+function displayPrice(product: Product) {
+  const onSale =
+    product.salePrice != null &&
+    product.salePrice < product.price &&
+    (product.promotionPercent || 0) > 0;
+  return onSale ? product.salePrice! : product.price;
+}
+
 export function CatalogPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState("Todos");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortKey>("featured");
 
   useEffect(() => {
     fetch("/api/products")
@@ -43,9 +56,29 @@ export function CatalogPage() {
   }, [products]);
 
   const filtered = useMemo(() => {
-    if (category === "Todos") return products;
-    return products.filter((p) => p.category === category);
-  }, [products, category]);
+    const q = query.trim().toLowerCase();
+    const list = products.filter((p) => {
+      if (category !== "Todos" && p.category !== category) return false;
+      if (!q) return true;
+      return (
+        p.name.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+      );
+    });
+
+    const ranked = [...list];
+    if (sort === "price-asc") {
+      ranked.sort((a, b) => displayPrice(a) - displayPrice(b));
+    } else if (sort === "price-desc") {
+      ranked.sort((a, b) => displayPrice(b) - displayPrice(a));
+    } else if (sort === "name") {
+      ranked.sort((a, b) => a.name.localeCompare(b.name, "es"));
+    } else {
+      ranked.sort((a, b) => Number(b.featured) - Number(a.featured));
+    }
+    return ranked;
+  }, [products, category, query, sort]);
 
   return (
     <main>
@@ -73,11 +106,22 @@ export function CatalogPage() {
           </h2>
         </Reveal>
 
-        {categories.length > 1 && (
-          <div className="sticky top-[57px] z-30 border-b border-[#e4d5c5]/80 bg-[#f7f1ea]/95 backdrop-blur-md sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-none">
-            <div className="scrollbar-none overflow-x-auto px-5 py-3.5 sm:flex sm:justify-center sm:overflow-visible sm:px-0 sm:py-6">
-              <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap sm:justify-center">
-                {categories.map((cat) => (
+        <div className="sticky top-[61px] z-30 border-b border-[#e4d5c5]/80 bg-[#f7f1ea]/95 backdrop-blur-md sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-none">
+          <div className="mx-auto flex max-w-2xl flex-col gap-3 px-5 py-3.5 sm:px-0 sm:py-6">
+            <label className="relative block">
+              <span className="sr-only">Buscar piezas</span>
+              <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a67c52]" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar por nombre, descripción o categoría"
+                className="w-full rounded-full border border-[#e4d5c5] bg-white/80 py-2.5 pl-10 pr-4 text-sm text-[#4a3b30] outline-none placeholder:text-[#8a7b6e] focus:border-[#c9b29a] focus:ring-2 focus:ring-[#c9956a]/20"
+              />
+            </label>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {categories.length > 1 &&
+                categories.map((cat) => (
                   <button
                     key={cat}
                     type="button"
@@ -91,10 +135,20 @@ export function CatalogPage() {
                     {cat}
                   </button>
                 ))}
-              </div>
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortKey)}
+                aria-label="Ordenar piezas"
+                className="rounded-full border border-[#e4d5c5] bg-white/80 px-3 py-2 text-[13px] text-[#5c4a3d] outline-none focus:border-[#c9b29a]"
+              >
+                <option value="featured">Destacadas</option>
+                <option value="price-asc">Precio: menor a mayor</option>
+                <option value="price-desc">Precio: mayor a menor</option>
+                <option value="name">Nombre A–Z</option>
+              </select>
             </div>
           </div>
-        )}
+        </div>
 
         <div className="px-4 sm:px-0">
           {loading ? (
@@ -109,12 +163,26 @@ export function CatalogPage() {
           ) : filtered.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-[#d4b896] bg-white/50 p-12 text-center">
               <p className="font-serif text-2xl text-[#4a3b30]">
-                Pronto vas a ver productos acá
+                {query.trim() || category !== "Todos"
+                  ? "No encontramos piezas con esa búsqueda"
+                  : "Pronto vas a ver productos acá"}
               </p>
+              {(query.trim() || category !== "Todos") && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setCategory("Todos");
+                  }}
+                  className="mt-4 rounded-full bg-[#4a3b30] px-5 py-2 text-sm text-white"
+                >
+                  Ver toda la colección
+                </button>
+              )}
             </div>
           ) : (
             <div
-              key={category}
+              key={`${category}-${sort}-${query}`}
               className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7"
             >
               {filtered.map((product, index) => (

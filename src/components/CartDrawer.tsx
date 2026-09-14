@@ -57,14 +57,6 @@ export function CartDrawer() {
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!whatsappUrl || !completedCode || checkoutChannel === "transfer") return;
-    const t = window.setTimeout(() => {
-      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-    }, 1800);
-    return () => window.clearTimeout(t);
-  }, [whatsappUrl, completedCode, checkoutChannel]);
-
   if (!isOpen) return null;
 
   function resetCheckoutFields() {
@@ -310,8 +302,8 @@ export function CartDrawer() {
                   {checkoutChannel === "transfer"
                     ? "Te enviamos el pedido por correo. Transferí al alias y avisá por WhatsApp con el comprobante."
                     : emailSent
-                      ? "Te enviamos el detalle al correo. Se abre WhatsApp para avisar al negocio."
-                      : "Pedido guardado. Se abre WhatsApp para avisar al negocio."}
+                      ? "Te enviamos el detalle al correo. Tocá el botón para avisar al negocio por WhatsApp."
+                      : "Pedido guardado. Tocá el botón para avisar al negocio por WhatsApp."}
                 </p>
               </div>
               <div className="flex w-full flex-col gap-2">

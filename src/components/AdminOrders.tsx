@@ -60,6 +60,64 @@ const channelLabel: Record<string, string> = {
   manual: "Manual",
 };
 
+const statusLabel: Record<string, string> = {
+  pending: "Pendiente",
+  completed: "Completado",
+  cancelled: "Cancelado",
+};
+
+function csvEscape(value: string | number | null | undefined) {
+  const text = String(value ?? "");
+  if (/[",\n\r]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
+  return text;
+}
+
+function downloadOrdersCsv(orders: Order[]) {
+  const headers = [
+    "codigo",
+    "fecha",
+    "estado",
+    "canal",
+    "cliente",
+    "telefono",
+    "email",
+    "envio",
+    "seguimiento",
+    "nota",
+    "items",
+    "total",
+  ];
+  const rows = orders.map((order) => [
+    csvEscape(order.code),
+    csvEscape(new Date(order.createdAt).toLocaleString("es-AR")),
+    csvEscape(statusLabel[order.status] ?? order.status),
+    csvEscape(channelLabel[order.channel] ?? order.channel),
+    csvEscape(order.customerName),
+    csvEscape(order.customerPhone),
+    csvEscape(order.customerEmail),
+    csvEscape(order.shippingCarrier),
+    csvEscape(order.trackingCode),
+    csvEscape(order.customerNote),
+    csvEscape(
+      order.items
+        .map((item) => `${item.quantity}x ${item.name}`)
+        .join("; ")
+    ),
+    csvEscape(order.total),
+  ]);
+  const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join("\r\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `aurea-ventas-${stamp}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function toOrderStatus(status: string) {
   if (status === "cancelled") return "cancelled";
   if (status === "pending") return "pending";
@@ -446,7 +504,7 @@ export function AdminOrders({ products }: { products: Product[] }) {
           <h3 className="font-serif text-xl text-[#4a3b30]">
             Pedidos ({filtered.length})
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {[
               ["all", "Todos"],
               ["manual", "Manual"],
@@ -467,6 +525,14 @@ export function AdminOrders({ products }: { products: Product[] }) {
                 {label}
               </button>
             ))}
+            <button
+              type="button"
+              disabled={filtered.length === 0}
+              onClick={() => downloadOrdersCsv(filtered)}
+              className="rounded-full bg-[#a67c52] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#8f6844] disabled:opacity-50"
+            >
+              Exportar CSV
+            </button>
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { SITE } from "@/lib/config";
 import { useCart } from "@/context/CartContext";
@@ -19,14 +20,26 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#e4d5c5]/70 bg-[#f7f1ea]/92 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6 sm:py-3.5">
-        <Link href="/" className="group min-w-0">
-          <p className="font-serif text-[1.35rem] tracking-[0.12em] text-[#4a3b30] transition duration-300 group-hover:tracking-[0.16em] group-hover:text-[#a67c52] sm:text-2xl">
-            {SITE.name}
-          </p>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-[#a67c52]">
-            {SITE.tagline}
-          </p>
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-2.5 sm:gap-3 sm:px-6 sm:py-3">
+        <Link href="/" className="group flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#faf6f1] ring-1 ring-[#d4b896]/55 sm:h-11 sm:w-11">
+            <Image
+              src="/logo-header.webp"
+              alt={SITE.name}
+              fill
+              className="object-contain p-[1px]"
+              sizes="44px"
+              unoptimized
+            />
+          </span>
+          <span className="min-w-0">
+            <p className="font-serif text-[1.25rem] leading-none tracking-[0.12em] text-[#4a3b30] transition duration-300 group-hover:tracking-[0.16em] group-hover:text-[#a67c52] sm:text-2xl">
+              {SITE.name}
+            </p>
+            <p className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-[#a67c52]">
+              {SITE.tagline}
+            </p>
+          </span>
         </Link>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
