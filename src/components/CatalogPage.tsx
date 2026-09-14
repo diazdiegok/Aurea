@@ -106,11 +106,8 @@ export function CatalogPage() {
 
       <section className="mx-auto max-w-6xl px-0 pb-16 pt-0 sm:px-6 sm:pb-20 sm:pt-2">
         <Reveal className="px-5 pb-1 pt-8 text-center sm:px-0 sm:pt-10">
-          <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-[#a67c52]">
-            El taller
-          </p>
-          <h2 className="mt-2 font-serif text-3xl text-[#4a3b30] sm:text-4xl">
-            Piezas con historia
+          <h2 className="font-serif text-3xl text-[#4a3b30] sm:text-4xl">
+            Piezas
           </h2>
         </Reveal>
 
