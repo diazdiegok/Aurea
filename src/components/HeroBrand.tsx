@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { SITE } from "@/lib/config";
+import { InstagramLink } from "@/components/InstagramLink";
 import { InstagramIcon, WhatsAppIcon } from "@/components/Icons";
 
 export function HeroBrand() {
@@ -97,15 +98,10 @@ export function HeroBrand() {
               <WhatsAppIcon className="h-4 w-4" />
               Consultar por WhatsApp
             </a>
-            <a
-              href={SITE.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-press inline-flex items-center justify-center gap-2 rounded-full border border-[#c9b29a] bg-white px-6 py-3.5 text-sm font-medium text-[#4a3b30] hover:bg-[#f7f1ea]"
-            >
+            <InstagramLink className="btn-press inline-flex items-center justify-center gap-2 rounded-full border border-[#c9b29a] bg-white px-6 py-3.5 text-sm font-medium text-[#4a3b30] hover:bg-[#f7f1ea]">
               <InstagramIcon className="h-4 w-4" />
               Instagram
-            </a>
+            </InstagramLink>
           </div>
         </div>
       </div>

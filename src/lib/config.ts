@@ -7,6 +7,7 @@ export const SITE = {
   tagline: "Joyas ADN",
   subtitle: "Accesorios y box personalizados",
   whatsapp: "5493435001061",
+  instagramHandle: "aurea.joyasadn",
   instagram: "https://www.instagram.com/aurea.joyasadn",
   currency: "ARS",
   /** Avisos internos cuando llega un pedido web */

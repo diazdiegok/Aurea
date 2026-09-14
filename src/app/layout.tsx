@@ -27,11 +27,14 @@ export const metadata: Metadata = {
     description: SITE.tagline,
     images: ["/logo.webp"],
   },
+  other: {
+    "supported-color-schemes": "light",
+  },
 };
 
 export const viewport = {
   themeColor: "#f7f1ea",
-  colorScheme: "light",
+  colorScheme: "only light",
 };
 
 export default function RootLayout({
@@ -40,7 +43,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${serif.variable} ${sans.variable} h-full`} style={{ colorScheme: "light" }}>
+    <html
+      lang="es"
+      className={`${serif.variable} ${sans.variable} h-full`}
+      style={{ colorScheme: "only light", backgroundColor: "#f7f1ea" }}
+    >
       <body className="flex min-h-full flex-col bg-[#f7f1ea] font-sans text-[#4a3b30] antialiased">
         <CartProvider>
           <Header />

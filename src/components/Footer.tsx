@@ -1,4 +1,5 @@
 import { SITE } from "@/lib/config";
+import { InstagramLink } from "@/components/InstagramLink";
 import { InstagramIcon, WhatsAppIcon } from "@/components/Icons";
 
 export function Footer() {
@@ -23,16 +24,13 @@ export function Footer() {
             <WhatsAppIcon className="h-4 w-4" />
             WhatsApp
           </a>
-          <a
-            href={SITE.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
+          <InstagramLink
             aria-label="Seguir en Instagram"
             className="btn-press inline-flex h-11 items-center gap-2 rounded-full border border-[#c9b29a] bg-white/50 px-5 text-sm font-medium text-[#4a3b30] hover:bg-white"
           >
             <InstagramIcon className="h-4 w-4" />
             Instagram
-          </a>
+          </InstagramLink>
         </div>
       </div>
     </footer>
