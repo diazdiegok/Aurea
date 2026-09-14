@@ -188,21 +188,8 @@ const productImages = [
 ];
 
 async function processLogo() {
-  const logoSrc =
-    "c__Users_diego_AppData_Roaming_Cursor_User_workspaceStorage_aeac9aba557bf238fb3c57a751b597e3_images_image-c3e666fc-4399-453e-9ca2-374074f0dd74.png";
-  const input = path.join(ASSETS, logoSrc);
-  const meta = await sharp(input).metadata();
-  const w = meta.width ?? 1024;
-  const h = meta.height ?? 1024;
-
-  const cropW = Math.round(w * 0.9);
-  const cropH = Math.round(h * 0.9);
-  const left = Math.round(w * 0.04);
-  const top = Math.round(h * 0.03);
-
-  const base = sharp(input)
-    .extract({ left, top, width: cropW, height: cropH })
-    .flatten({ background: CREAM });
+  const input = path.join(PUBLIC, "logo.png");
+  const base = sharp(input).flatten({ background: CREAM });
 
   await base
     .clone()
