@@ -99,6 +99,12 @@ function parseFrom(raw?: string | null) {
   };
 }
 
+/** Solo para el admin: muestra el From sin secretos. */
+export function parseFromForStatus(raw?: string | null) {
+  const parsed = parseFrom(raw);
+  return `${parsed.name} <${parsed.email}>`;
+}
+
 export function getEmailProvider(): "brevo" | "resend" | null {
   if (process.env.BREVO_API_KEY?.trim()) return "brevo";
   if (process.env.RESEND_API_KEY?.trim()) return "resend";
@@ -206,7 +212,7 @@ async function sendViaResend(
   return { ok: true, skipped: false, provider: "resend" };
 }
 
-async function sendMail(
+export async function sendMail(
   to: string | string[],
   subject: string,
   html: string

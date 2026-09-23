@@ -37,6 +37,7 @@ export function CartDrawer() {
   const [submitting, setSubmitting] = useState(false);
   const [completedCode, setCompletedCode] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [checkoutChannel, setCheckoutChannel] = useState<"whatsapp" | "transfer" | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -101,6 +102,7 @@ export function CartDrawer() {
   function handleClose() {
     setCompletedCode(null);
     setEmailSent(null);
+    setEmailError(null);
     setWhatsappUrl(null);
     setCheckoutChannel(null);
     closeCart();
@@ -235,6 +237,10 @@ export function CartDrawer() {
       }
       if (data.code) orderCode = String(data.code);
       sent = data.emailSent === true;
+      const errors = [data.emailError, data.notifyError]
+        .filter((e): e is string => typeof e === "string" && e.length > 0)
+        .join(" · ");
+      setEmailError(errors || (data.notifySent !== true && data.emailSent !== true ? "Los correos no se pudieron enviar" : null));
       if (data.notifySent !== true) {
         console.warn("Avisos internos no enviados:", data.notifyError);
       }
@@ -364,6 +370,11 @@ export function CartDrawer() {
                       ? "Te enviamos el detalle al correo. Tocá el botón para avisar al negocio por WhatsApp."
                       : "Pedido guardado. Tocá el botón para avisar al negocio por WhatsApp."}
                 </p>
+                {emailError && (
+                  <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                    El correo no salió: {emailError}
+                  </p>
+                )}
               </div>
               <div className="flex w-full flex-col gap-2">
                 {whatsappUrl && (

@@ -84,6 +84,15 @@ function relativeTime(iso: string) {
 export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState("");
+  const [emailStatus, setEmailStatus] = useState<{
+    configured: boolean;
+    provider: string | null;
+    from: string;
+    notifyEmails: string[];
+    hint: string;
+  } | null>(null);
+  const [emailTesting, setEmailTesting] = useState(false);
+  const [emailMsg, setEmailMsg] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/dashboard")
@@ -93,7 +102,36 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
       })
       .then(setData)
       .catch((e) => setError(e.message));
+
+    fetch("/api/admin/email")
+      .then(async (r) => (r.ok ? r.json() : null))
+      .then((json) => json && setEmailStatus(json))
+      .catch(() => {});
   }, []);
+
+  async function sendTestEmail() {
+    setEmailTesting(true);
+    setEmailMsg("");
+    try {
+      const res = await fetch("/api/admin/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) {
+        setEmailMsg(json.error || "No se pudo enviar la prueba");
+        return;
+      }
+      setEmailMsg(
+        `Prueba enviada a ${Array.isArray(json.recipients) ? json.recipients.join(", ") : "los avisos"} (${json.provider}). Revisá bandeja y spam.`
+      );
+    } catch {
+      setEmailMsg("No se pudo conectar para enviar la prueba");
+    } finally {
+      setEmailTesting(false);
+    }
+  }
 
   const weekTotal = useMemo(
     () => (data ? data.last7.reduce((s, d) => s + d.total, 0) : 0),
@@ -146,6 +184,55 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
 
   return (
     <div className="space-y-6">
+      {emailStatus && (
+        <section
+          className={`rounded-2xl border p-4 sm:p-5 ${
+            emailStatus.configured
+              ? "border-[#c5d9cf] bg-[#f3faf6]"
+              : "border-red-200 bg-red-50"
+          }`}
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#a67c52]">
+                Correos de pedidos
+              </p>
+              <p className="mt-1 font-medium text-[#4a3b30]">
+                {emailStatus.configured
+                  ? `Proveedor: ${emailStatus.provider}`
+                  : "No configurado — no salen mails"}
+              </p>
+              <p className="mt-1 text-sm text-[#6d5c4d]">
+                From: {emailStatus.from}
+              </p>
+              <p className="mt-0.5 text-sm text-[#6d5c4d]">
+                Avisos a: {emailStatus.notifyEmails.join(", ") || "—"}
+              </p>
+              <p className="mt-2 text-sm text-[#6d5c4d]">{emailStatus.hint}</p>
+              {emailMsg && (
+                <p
+                  className={`mt-2 text-sm ${
+                    emailMsg.startsWith("Prueba enviada")
+                      ? "text-[#2f6f5e]"
+                      : "text-red-700"
+                  }`}
+                >
+                  {emailMsg}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={sendTestEmail}
+              disabled={emailTesting || !emailStatus.configured}
+              className="rounded-full bg-[#4a3b30] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            >
+              {emailTesting ? "Enviando..." : "Enviar prueba"}
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* Resumen principal */}
       <section className="overflow-hidden rounded-3xl border border-[#e4d5c5] bg-[linear-gradient(135deg,#fffdf9_0%,#f5ebe3_55%,#efe0d2_100%)] p-5 sm:p-7">
         <div className="flex flex-wrap items-start justify-between gap-4">

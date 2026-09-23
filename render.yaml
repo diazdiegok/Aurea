@@ -24,3 +24,9 @@ services:
         generateValue: true
       - key: NEXT_PUBLIC_BASE_URL
         sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: ORDER_NOTIFY_EMAIL
+        sync: false
