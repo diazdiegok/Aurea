@@ -106,9 +106,14 @@ export function parseFromForStatus(raw?: string | null) {
 }
 
 export function getEmailProvider(): "brevo" | "resend" | null {
-  if (process.env.BREVO_API_KEY?.trim()) return "brevo";
-  if (process.env.RESEND_API_KEY?.trim()) return "resend";
+  if (cleanApiKey(process.env.BREVO_API_KEY)) return "brevo";
+  if (cleanApiKey(process.env.RESEND_API_KEY)) return "resend";
   return null;
+}
+
+function cleanApiKey(raw?: string | null) {
+  const key = String(raw || "").replace(/\s+/g, "").trim();
+  return key || null;
 }
 
 export function isEmailConfigured() {
@@ -120,7 +125,15 @@ async function sendViaBrevo(
   subject: string,
   html: string
 ): Promise<SendMailResult> {
-  const apiKey = process.env.BREVO_API_KEY!.trim();
+  const apiKey = cleanApiKey(process.env.BREVO_API_KEY);
+  if (!apiKey) {
+    return {
+      ok: false,
+      skipped: true,
+      error: "BREVO_API_KEY vacía",
+      provider: "brevo",
+    };
+  }
   const sender = parseFrom(
     process.env.EMAIL_FROM || process.env.SMTP_USER
   );
@@ -160,10 +173,28 @@ async function sendViaBrevo(
   };
 
   if (!response.ok) {
-    const message =
+    let message =
       json.message ||
       json.code ||
       `Brevo error HTTP ${response.status}`;
+    const lower = message.toLowerCase();
+    if (
+      response.status === 401 ||
+      lower.includes("unauthorized") ||
+      lower.includes("api-key") ||
+      lower.includes("api key")
+    ) {
+      message =
+        "Brevo rechazó la API key. Regenerá BREVO_API_KEY en Brevo y pegala en Render sin espacios.";
+    } else if (
+      lower.includes("sender") ||
+      lower.includes("not verified") ||
+      lower.includes("unrecognised") ||
+      lower.includes("unrecognized") ||
+      response.status === 400
+    ) {
+      message = `${message} — Verificá el remitente ${sender.email} en Brevo → Senders.`;
+    }
     console.error("Error Brevo:", message, {
       status: response.status,
       sender: sender.email,
@@ -183,7 +214,15 @@ async function sendViaResend(
   subject: string,
   html: string
 ): Promise<SendMailResult> {
-  const apiKey = process.env.RESEND_API_KEY!.trim();
+  const apiKey = cleanApiKey(process.env.RESEND_API_KEY);
+  if (!apiKey) {
+    return {
+      ok: false,
+      skipped: true,
+      error: "RESEND_API_KEY vacía",
+      provider: "resend",
+    };
+  }
   const from =
     process.env.EMAIL_FROM?.trim() ||
     `${SITE.emailBrand} <${SITE.contactEmail}>`;
@@ -199,11 +238,15 @@ async function sendViaResend(
   });
 
   if (error) {
-    console.error("Error Resend:", error.message);
+    let message = error.message;
+    if (/gmail\.com|domain|verified|from/i.test(message)) {
+      message = `${message} — Resend no envía desde Gmail. Usá Brevo (ya tenés BREVO_API_KEY) o un dominio verificado.`;
+    }
+    console.error("Error Resend:", message);
     return {
       ok: false,
       skipped: false,
-      error: error.message,
+      error: message,
       provider: "resend",
     };
   }
