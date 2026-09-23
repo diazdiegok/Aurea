@@ -33,6 +33,7 @@ export async function createOrder(input: {
   customerPhone?: string;
   customerEmail?: string;
   customerNote?: string;
+  receiptUrl?: string | null;
   status?: OrderStatus;
   mpPreferenceId?: string;
   couponCode?: string | null;
@@ -71,6 +72,7 @@ export async function createOrder(input: {
       customerPhone: input.customerPhone || null,
       customerEmail: input.customerEmail || null,
       customerNote: input.customerNote || "",
+      receiptUrl: input.receiptUrl || null,
       total,
       couponCode: input.couponCode || null,
       discountPercent: discountPercent || null,

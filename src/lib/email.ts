@@ -110,7 +110,7 @@ export function isEmailConfigured() {
 }
 
 async function sendViaBrevo(
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<SendMailResult> {
@@ -118,6 +118,18 @@ async function sendViaBrevo(
   const sender = parseFrom(
     process.env.EMAIL_FROM || process.env.SMTP_USER
   );
+  const recipients = (Array.isArray(to) ? to : [to])
+    .map((email) => normalizeEmail(email))
+    .filter((email) => isValidEmail(email));
+
+  if (!recipients.length) {
+    return {
+      ok: false,
+      skipped: true,
+      error: "Sin destinatarios",
+      provider: "brevo",
+    };
+  }
 
   const response = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
@@ -128,7 +140,7 @@ async function sendViaBrevo(
     },
     body: JSON.stringify({
       sender: { name: sender.name, email: sender.email },
-      to: [{ email: to }],
+      to: recipients.map((email) => ({ email })),
       subject,
       htmlContent: html,
       replyTo: { email: sender.email, name: sender.name },
@@ -138,16 +150,25 @@ async function sendViaBrevo(
   const json = (await response.json().catch(() => ({}))) as {
     messageId?: string;
     message?: string;
+    code?: string;
   };
 
   if (!response.ok) {
     const message =
-      json.message || `Brevo error HTTP ${response.status}`;
-    console.error("Error Brevo:", message);
+      json.message ||
+      json.code ||
+      `Brevo error HTTP ${response.status}`;
+    console.error("Error Brevo:", message, {
+      status: response.status,
+      sender: sender.email,
+      to: recipients,
+    });
     return { ok: false, skipped: false, error: message, provider: "brevo" };
   }
 
-  console.log(`Correo enviado a ${to} via Brevo: ${json.messageId || "ok"}`);
+  console.log(
+    `Correo enviado a ${recipients.join(", ")} via Brevo: ${json.messageId || "ok"}`
+  );
   return { ok: true, skipped: false, provider: "brevo" };
 }
 
@@ -186,7 +207,7 @@ async function sendViaResend(
 }
 
 async function sendMail(
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<SendMailResult> {
@@ -202,7 +223,18 @@ async function sendMail(
 
   try {
     if (provider === "brevo") return await sendViaBrevo(to, subject, html);
-    return await sendViaResend(to, subject, html);
+
+    const list = Array.isArray(to) ? to : [to];
+    const results = await Promise.all(
+      list.map((email) => sendViaResend(email, subject, html))
+    );
+    const failed = results.filter((r) => !r.ok);
+    if (failed.length === results.length) return failed[0];
+    return {
+      ok: true,
+      skipped: false,
+      provider: "resend",
+    };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Error al enviar correo";
@@ -284,6 +316,7 @@ export async function sendNewOrderNotifyEmail(
     customerPhone?: string | null;
     customerEmail?: string | null;
     channel?: string | null;
+    receiptUrl?: string | null;
   }
 ) {
   const recipients = getOrderNotifyEmails().filter(
@@ -297,6 +330,7 @@ export async function sendNewOrderNotifyEmail(
       ok: false as const,
       skipped: true,
       error: "Sin destinatarios de aviso",
+      recipients: [] as string[],
     };
   }
 
@@ -308,6 +342,12 @@ export async function sendNewOrderNotifyEmail(
         : order.channel === "whatsapp"
           ? "Web / WhatsApp"
           : order.channel || "Web";
+
+  const receiptAbsolute = order.receiptUrl
+    ? order.receiptUrl.startsWith("http")
+      ? order.receiptUrl
+      : `${getBaseUrl()}${order.receiptUrl}`
+    : null;
 
   const body = `
     <p style="margin:16px 0;line-height:1.6;color:#6d5c4d;font-size:15px;">
@@ -346,6 +386,13 @@ export async function sendNewOrderNotifyEmail(
         ? `<p style="margin:16px 0 0;padding:12px;background:#f7f1ea;border-radius:12px;font-size:14px;color:#6d5c4d;">Nota del cliente: ${escapeHtml(order.customerNote)}</p>`
         : ""
     }
+    ${
+      receiptAbsolute
+        ? `<p style="margin:20px 0 8px;font-size:14px;color:#6d5c4d;"><strong>Comprobante de transferencia</strong></p>
+           <p style="margin:0 0 12px;"><a href="${escapeHtml(receiptAbsolute)}" style="color:#2f6f5e;">Ver comprobante</a></p>
+           <img src="${escapeHtml(receiptAbsolute)}" alt="Comprobante" width="420" style="display:block;max-width:100%;height:auto;border:1px solid #e4d5c5;border-radius:12px;" />`
+        : ""
+    }
     <p style="margin:20px 0 0;font-size:14px;color:#6d5c4d;">
       Revisalo en el admin: ${escapeHtml(getBaseUrl())}/admin
     </p>
@@ -353,19 +400,17 @@ export async function sendNewOrderNotifyEmail(
 
   const subject = `Nuevo pedido ${order.code} — ${formatPrice(order.total)}`;
   const html = wrapEmail("Nuevo pedido web", body);
-  const results = await Promise.all(
-    recipients.map((to) => sendMail(to, subject, html))
-  );
+  const result = await sendMail(recipients, subject, html);
 
-  const failed = results.filter((r) => !r.ok);
-  if (failed.length === results.length) {
-    return failed[0];
+  if (!result.ok) {
+    return { ...result, recipients };
   }
 
   return {
     ok: true as const,
     skipped: false as const,
-    provider: results.find((r) => r.ok && !r.skipped)?.provider || "multi",
+    provider: result.provider || "multi",
+    recipients,
   };
 }
 

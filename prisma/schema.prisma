@@ -43,6 +43,7 @@ model Order {
   customerPhone   String?
   customerEmail  String?
   customerNote    String      @default("")
+  receiptUrl      String?
   total           Float
   couponCode      String?
   discountPercent Float?

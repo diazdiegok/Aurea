@@ -10,6 +10,10 @@ import {
 
 const PUBLIC_CHANNELS = ["whatsapp", "transfer"] as const;
 
+function isValidReceiptUrl(value: string) {
+  return /^\/api\/media\/[a-zA-Z0-9_-]+$/.test(value);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -18,6 +22,7 @@ export async function POST(request: NextRequest) {
     const customerName = String(body.customerName || "").trim();
     const customerPhone = String(body.customerPhone || "").trim();
     const note = String(body.note || "").trim().slice(0, 500);
+    const receiptUrlRaw = String(body.receiptUrl || "").trim();
 
     if (!PUBLIC_CHANNELS.includes(channel as (typeof PUBLIC_CHANNELS)[number])) {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
@@ -44,6 +49,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let receiptUrl: string | null = null;
+    if (channel === "transfer") {
+      if (!receiptUrlRaw || !isValidReceiptUrl(receiptUrlRaw)) {
+        return NextResponse.json(
+          { error: "Adjuntá el comprobante de la transferencia" },
+          { status: 400 }
+        );
+      }
+      receiptUrl = receiptUrlRaw;
+    }
+
     const quoted = await quoteCart({
       items: body.items || [],
       couponCode: body.couponCode ? String(body.couponCode) : null,
@@ -56,6 +72,7 @@ export async function POST(request: NextRequest) {
       customerPhone,
       customerEmail: email,
       customerNote: note,
+      receiptUrl,
       status: "pending",
       couponCode: quoted.couponCode,
       discountPercent: quoted.discountPercent,
@@ -73,6 +90,7 @@ export async function POST(request: NextRequest) {
       customerPhone,
       customerEmail: email,
       channel,
+      receiptUrl,
     };
 
     const [mail, notify] = await Promise.all([
@@ -80,8 +98,14 @@ export async function POST(request: NextRequest) {
       sendNewOrderNotifyEmail(mailPayload),
     ]);
 
-    if (!notify.ok && !notify.skipped) {
-      console.error("Order notify email failed:", notify.error);
+    if (!mail.ok) {
+      console.error("Order customer email failed:", mail.error, mail.provider);
+    }
+    if (!notify.ok) {
+      console.error("Order notify email failed:", notify.error, {
+        skipped: notify.skipped,
+        provider: "provider" in notify ? notify.provider : undefined,
+      });
     }
 
     return NextResponse.json({
@@ -95,6 +119,12 @@ export async function POST(request: NextRequest) {
       emailSkipped: mail.skipped,
       emailError: mail.ok ? null : mail.error,
       notifySent: notify.ok,
+      notifySkipped: notify.skipped,
+      notifyError: notify.ok ? null : notify.error,
+      notifyRecipients:
+        "recipients" in notify && Array.isArray(notify.recipients)
+          ? notify.recipients
+          : undefined,
     });
   } catch (error) {
     if (error instanceof CheckoutError) {

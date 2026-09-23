@@ -26,3 +26,24 @@ export async function optimizeProductImage(buffer: Buffer) {
 
   return `/api/media/${media.id}`;
 }
+
+/** Comprobante de transferencia: mantiene proporción, sin recorte cuadrado. */
+export async function optimizeReceiptImage(buffer: Buffer) {
+  const webp = await sharp(buffer)
+    .rotate()
+    .resize(1600, 1600, {
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .webp({ quality: 82, effort: 4 })
+    .toBuffer();
+
+  const media = await db.media.create({
+    data: {
+      mimeType: "image/webp",
+      data: webp,
+    },
+  });
+
+  return `/api/media/${media.id}`;
+}

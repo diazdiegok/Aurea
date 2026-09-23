@@ -114,7 +114,8 @@ export function buildWhatsAppUrl(options: WhatsAppOrderOptions) {
       `Hola! Realicé un *pedido por transferencia* en *${brand}*.`,
       "",
       `Alias: ${SITE.transfer.alias}`,
-      `Total a transferir: *${formatPrice(total)}*`,
+      `Total transferido: *${formatPrice(total)}*`,
+      `Adjunté el *comprobante* en la web.`,
       ""
     );
   } else {

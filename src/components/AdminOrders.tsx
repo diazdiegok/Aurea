@@ -33,6 +33,7 @@ type Order = {
   customerPhone: string | null;
   customerEmail: string | null;
   customerNote: string;
+  receiptUrl?: string | null;
   total: number;
   shippingCarrier: string | null;
   trackingCode: string | null;
@@ -855,6 +856,25 @@ export function AdminOrders({ products }: { products: Product[] }) {
                       <p className="mt-2 rounded-xl bg-[#f7f1ea] px-3 py-2 text-sm text-[#6d5c4d]">
                         Nota: {order.customerNote}
                       </p>
+                    )}
+
+                    {order.receiptUrl && (
+                      <a
+                        href={order.receiptUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 flex items-center gap-3 rounded-xl border border-[#e4d5c5] bg-[#faf6f1] p-2 transition hover:bg-[#f3ebe3]"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={order.receiptUrl}
+                          alt={`Comprobante ${order.code}`}
+                          className="h-16 w-16 rounded-lg object-cover"
+                        />
+                        <span className="text-sm font-medium text-[#2f6f5e]">
+                          Ver comprobante de transferencia
+                        </span>
+                      </a>
                     )}
 
                     <div className="mt-4 flex flex-wrap items-center gap-2">

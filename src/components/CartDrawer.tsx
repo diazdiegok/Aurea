@@ -47,6 +47,8 @@ export function CartDrawer() {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [showTransfer, setShowTransfer] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -68,6 +70,32 @@ export function CartDrawer() {
     setEditingItemId(null);
     setCouponInput("");
     setCouponMsg("");
+    clearReceipt();
+  }
+
+  function clearReceipt() {
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+    setReceiptFile(null);
+    setReceiptPreview(null);
+  }
+
+  function handleReceiptChange(file: File | null) {
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+    if (!file) {
+      setReceiptFile(null);
+      setReceiptPreview(null);
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      setNotice("El comprobante tiene que ser una imagen");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setNotice("El comprobante no puede superar 8 MB");
+      return;
+    }
+    setReceiptFile(file);
+    setReceiptPreview(URL.createObjectURL(file));
   }
 
   function handleClose() {
@@ -144,6 +172,12 @@ export function CartDrawer() {
   async function handleConfirmOrder(channel: "whatsapp" | "transfer" = "whatsapp") {
     if (submitting || items.length === 0) return;
     if (!validateCheckout()) return;
+
+    if (channel === "transfer" && !receiptFile) {
+      setNotice("Adjuntá una foto del comprobante de la transferencia");
+      return;
+    }
+
     setSubmitting(true);
 
     const cartSnapshot = [...items];
@@ -163,13 +197,33 @@ export function CartDrawer() {
     let sent: boolean | null = null;
 
     try {
+      let receiptUrl: string | null = null;
+      if (channel === "transfer" && receiptFile) {
+        const form = new FormData();
+        form.append("file", receiptFile);
+        const uploadRes = await fetch("/api/orders/receipt", {
+          method: "POST",
+          body: form,
+        });
+        const uploadData = await uploadRes.json().catch(() => ({}));
+        if (!uploadRes.ok || !uploadData.url) {
+          setNotice(uploadData.error || "No se pudo subir el comprobante");
+          return;
+        }
+        receiptUrl = String(uploadData.url);
+      }
+
       const controller = new AbortController();
       const timeout = window.setTimeout(() => controller.abort(), 25_000);
 
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...orderPayload(), channel }),
+        body: JSON.stringify({
+          ...orderPayload(),
+          channel,
+          receiptUrl,
+        }),
         signal: controller.signal,
       });
       window.clearTimeout(timeout);
@@ -181,6 +235,9 @@ export function CartDrawer() {
       }
       if (data.code) orderCode = String(data.code);
       sent = data.emailSent === true;
+      if (data.notifySent !== true) {
+        console.warn("Avisos internos no enviados:", data.notifyError);
+      }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
         setNotice(
@@ -300,7 +357,9 @@ export function CartDrawer() {
                 )}
                 <p className="mt-4 text-sm text-[#8a7b6e]">
                   {checkoutChannel === "transfer"
-                    ? "Te enviamos el pedido por correo. Transferí al alias y avisá por WhatsApp con el comprobante."
+                    ? emailSent
+                      ? "Te enviamos el pedido por correo. El comprobante quedó adjunto al aviso del negocio."
+                      : "Pedido guardado con el comprobante. Tocá WhatsApp si querés avisar también."
                     : emailSent
                       ? "Te enviamos el detalle al correo. Tocá el botón para avisar al negocio por WhatsApp."
                       : "Pedido guardado. Tocá el botón para avisar al negocio por WhatsApp."}
@@ -595,16 +654,65 @@ export function CartDrawer() {
 
             <p className="mt-4 text-sm text-[#6d5c4d]">
               Transferí el total ({formatPrice(total)}) a estos datos. Después
-              confirmá el pedido para que quede registrado.
+              adjuntá el comprobante y confirmá el pedido.
             </p>
+
+            <div className="mt-4 rounded-2xl border border-dashed border-[#d4b896] bg-white p-3.5">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#a67c52]">
+                Comprobante *
+              </p>
+              <p className="mt-1 text-sm text-[#6d5c4d]">
+                Foto o captura de la transferencia (JPG/PNG).
+              </p>
+              <label className="mt-3 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-[#e4d5c5] bg-[#faf6f1] px-3 py-4 text-center transition hover:bg-[#f3ebe3]">
+                <span className="text-sm font-medium text-[#4a3b30]">
+                  {receiptFile ? "Cambiar imagen" : "Adjuntar comprobante"}
+                </span>
+                {receiptFile && (
+                  <span className="mt-1 max-w-full truncate text-xs text-[#8a7b6e]">
+                    {receiptFile.name}
+                  </span>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="sr-only"
+                  onChange={(e) =>
+                    handleReceiptChange(e.target.files?.[0] || null)
+                  }
+                />
+              </label>
+              {receiptPreview && (
+                <div className="mt-3 overflow-hidden rounded-xl border border-[#e4d5c5]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={receiptPreview}
+                    alt="Vista previa del comprobante"
+                    className="max-h-48 w-full object-contain bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={clearReceipt}
+                    className="w-full border-t border-[#e4d5c5] py-2 text-xs text-red-600 hover:bg-[#faf6f1]"
+                  >
+                    Quitar comprobante
+                  </button>
+                </div>
+              )}
+            </div>
 
             <button
               type="button"
               onClick={() => handleConfirmOrder("transfer")}
-              disabled={submitting}
+              disabled={submitting || !receiptFile}
               className="mt-4 w-full rounded-full bg-[#2f6f5e] px-4 py-3 text-sm font-medium text-white disabled:opacity-60"
             >
-              {submitting ? "Registrando..." : "Ya transferí · confirmar pedido"}
+              {submitting
+                ? "Registrando..."
+                : receiptFile
+                  ? "Ya transferí · confirmar pedido"
+                  : "Adjuntá el comprobante para continuar"}
             </button>
             <button
               type="button"
