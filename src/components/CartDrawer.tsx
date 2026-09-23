@@ -585,7 +585,7 @@ export function CartDrawer() {
       </aside>
 
       {showTransfer && (
-        <div className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[12vh] sm:pt-[15vh]">
+        <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-4 sm:py-8">
           <button
             type="button"
             aria-label="Cerrar"
@@ -596,9 +596,9 @@ export function CartDrawer() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="transfer-title"
-            className="relative w-full max-w-sm rounded-3xl border border-[#e4d5c5] bg-[#f7f1ea] p-5 shadow-2xl"
+            className="relative flex max-h-[min(92vh,720px)] w-full max-w-sm flex-col overflow-hidden rounded-3xl border border-[#e4d5c5] bg-[#f7f1ea] shadow-2xl"
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex shrink-0 items-start justify-between gap-3 px-5 pt-5">
               <div>
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#a67c52]">
                   Datos bancarios
@@ -619,108 +619,112 @@ export function CartDrawer() {
               </button>
             </div>
 
-            <ul className="mt-4 space-y-3">
-              {(
-                [
-                  ["Alias", SITE.transfer.alias],
-                  ["CVU", SITE.transfer.cvu],
-                  ["Nombre", SITE.transfer.holder],
-                ] as const
-              ).map(([label, value]) => (
-                <li
-                  key={label}
-                  className="rounded-2xl border border-[#e4d5c5] bg-white px-3.5 py-3"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#a67c52]">
-                        {label}
-                      </p>
-                      <p className="mt-1 break-all font-medium text-[#4a3b30]">
-                        {value}
-                      </p>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4">
+              <ul className="space-y-3">
+                {(
+                  [
+                    ["Alias", SITE.transfer.alias],
+                    ["CVU", SITE.transfer.cvu],
+                    ["Nombre", SITE.transfer.holder],
+                  ] as const
+                ).map(([label, value]) => (
+                  <li
+                    key={label}
+                    className="rounded-2xl border border-[#e4d5c5] bg-white px-3.5 py-3"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-[11px] uppercase tracking-[0.14em] text-[#a67c52]">
+                          {label}
+                        </p>
+                        <p className="mt-1 break-all font-medium text-[#4a3b30]">
+                          {value}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => copyTransferValue(label, value)}
+                        className="shrink-0 rounded-full border border-[#e4d5c5] px-3 py-1.5 text-xs text-[#5c4a3d] hover:bg-[#faf6f1]"
+                      >
+                        {copiedField === label ? "Copiado" : "Copiar"}
+                      </button>
                     </div>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-4 text-sm text-[#6d5c4d]">
+                Transferí el total ({formatPrice(total)}) a estos datos. Después
+                adjuntá el comprobante y confirmá el pedido.
+              </p>
+
+              <div className="mt-4 rounded-2xl border border-dashed border-[#d4b896] bg-white p-3.5">
+                <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#a67c52]">
+                  Comprobante *
+                </p>
+                <p className="mt-1 text-sm text-[#6d5c4d]">
+                  Foto o captura de la transferencia (JPG/PNG).
+                </p>
+                <label className="mt-3 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-[#e4d5c5] bg-[#faf6f1] px-3 py-3 text-center transition hover:bg-[#f3ebe3]">
+                  <span className="text-sm font-medium text-[#4a3b30]">
+                    {receiptFile ? "Cambiar imagen" : "Adjuntar comprobante"}
+                  </span>
+                  {receiptFile && (
+                    <span className="mt-1 max-w-full truncate text-xs text-[#8a7b6e]">
+                      {receiptFile.name}
+                    </span>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="sr-only"
+                    onChange={(e) =>
+                      handleReceiptChange(e.target.files?.[0] || null)
+                    }
+                  />
+                </label>
+                {receiptPreview && (
+                  <div className="mt-3 overflow-hidden rounded-xl border border-[#e4d5c5]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={receiptPreview}
+                      alt="Vista previa del comprobante"
+                      className="max-h-28 w-full object-contain bg-white"
+                    />
                     <button
                       type="button"
-                      onClick={() => copyTransferValue(label, value)}
-                      className="shrink-0 rounded-full border border-[#e4d5c5] px-3 py-1.5 text-xs text-[#5c4a3d] hover:bg-[#faf6f1]"
+                      onClick={clearReceipt}
+                      className="w-full border-t border-[#e4d5c5] py-2 text-xs text-red-600 hover:bg-[#faf6f1]"
                     >
-                      {copiedField === label ? "Copiado" : "Copiar"}
+                      Quitar comprobante
                     </button>
                   </div>
-                </li>
-              ))}
-            </ul>
-
-            <p className="mt-4 text-sm text-[#6d5c4d]">
-              Transferí el total ({formatPrice(total)}) a estos datos. Después
-              adjuntá el comprobante y confirmá el pedido.
-            </p>
-
-            <div className="mt-4 rounded-2xl border border-dashed border-[#d4b896] bg-white p-3.5">
-              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#a67c52]">
-                Comprobante *
-              </p>
-              <p className="mt-1 text-sm text-[#6d5c4d]">
-                Foto o captura de la transferencia (JPG/PNG).
-              </p>
-              <label className="mt-3 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-[#e4d5c5] bg-[#faf6f1] px-3 py-4 text-center transition hover:bg-[#f3ebe3]">
-                <span className="text-sm font-medium text-[#4a3b30]">
-                  {receiptFile ? "Cambiar imagen" : "Adjuntar comprobante"}
-                </span>
-                {receiptFile && (
-                  <span className="mt-1 max-w-full truncate text-xs text-[#8a7b6e]">
-                    {receiptFile.name}
-                  </span>
                 )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="sr-only"
-                  onChange={(e) =>
-                    handleReceiptChange(e.target.files?.[0] || null)
-                  }
-                />
-              </label>
-              {receiptPreview && (
-                <div className="mt-3 overflow-hidden rounded-xl border border-[#e4d5c5]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={receiptPreview}
-                    alt="Vista previa del comprobante"
-                    className="max-h-48 w-full object-contain bg-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={clearReceipt}
-                    className="w-full border-t border-[#e4d5c5] py-2 text-xs text-red-600 hover:bg-[#faf6f1]"
-                  >
-                    Quitar comprobante
-                  </button>
-                </div>
-              )}
+              </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => handleConfirmOrder("transfer")}
-              disabled={submitting || !receiptFile}
-              className="mt-4 w-full rounded-full bg-[#2f6f5e] px-4 py-3 text-sm font-medium text-white disabled:opacity-60"
-            >
-              {submitting
-                ? "Registrando..."
-                : receiptFile
-                  ? "Ya transferí · confirmar pedido"
-                  : "Adjuntá el comprobante para continuar"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowTransfer(false)}
-              className="mt-2 w-full rounded-full border border-[#e4d5c5] bg-white px-4 py-3 text-sm text-[#5c4a3d]"
-            >
-              Volver
-            </button>
+            <div className="shrink-0 border-t border-[#e4d5c5] bg-[#f7f1ea] px-5 py-4">
+              <button
+                type="button"
+                onClick={() => handleConfirmOrder("transfer")}
+                disabled={submitting || !receiptFile}
+                className="w-full rounded-full bg-[#2f6f5e] px-4 py-3 text-sm font-medium text-white disabled:opacity-60"
+              >
+                {submitting
+                  ? "Registrando..."
+                  : receiptFile
+                    ? "Ya transferí · confirmar pedido"
+                    : "Adjuntá el comprobante para continuar"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowTransfer(false)}
+                className="mt-2 w-full rounded-full border border-[#e4d5c5] bg-white px-4 py-3 text-sm text-[#5c4a3d]"
+              >
+                Volver
+              </button>
+            </div>
           </div>
         </div>
       )}
