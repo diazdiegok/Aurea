@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import { AshesShowcase } from "@/components/AshesShowcase";
 
 export const metadata: Metadata = {
   title: "Joyas con cenizas de cremación | Aurea Joyas ADN",
@@ -18,7 +18,7 @@ const paragraphs = [
 
 export default function JoyasCenizasPage() {
   return (
-    <main className="relative overflow-hidden">
+    <main className="relative">
       <div
         className="pointer-events-none absolute inset-0 opacity-60"
         style={{
@@ -28,23 +28,7 @@ export default function JoyasCenizasPage() {
       />
 
       <article className="relative mx-auto grid max-w-6xl items-start gap-10 px-5 py-10 sm:px-6 sm:py-14 lg:grid-cols-[minmax(0,1fr)_minmax(300px,480px)] lg:gap-16">
-        <figure className="relative lg:sticky lg:top-28 lg:order-last">
-          <div
-            className="pointer-events-none absolute -inset-8 rounded-[48px] bg-[radial-gradient(circle_at_42%_38%,#e7d3b8_0%,transparent_68%)] opacity-80 blur-2xl"
-            aria-hidden="true"
-          />
-          <div className="relative overflow-hidden rounded-[32px] bg-white shadow-[0_30px_80px_-36px_rgba(74,59,48,0.55)] ring-1 ring-white/80">
-            <Image
-              src="/images/joyas-cenizas.png"
-              alt="Anillo y dije de plata con cenizas de cremación"
-              width={1024}
-              height={1024}
-              priority
-              className="ashes-photo h-auto w-full"
-            />
-            <div className="ashes-gleam" aria-hidden="true" />
-          </div>
-        </figure>
+        <AshesShowcase />
 
         <div className="max-w-2xl">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#a67c52]">
