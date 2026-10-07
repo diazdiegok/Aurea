@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { publicProductImage } from "@/lib/product-images";
 import { getActivePromotions, withPromotionPricing } from "@/lib/promotions";
 
 export async function GET() {
@@ -12,6 +13,11 @@ export async function GET() {
   ]);
 
   return NextResponse.json(
-    products.map((p) => withPromotionPricing(p, promotions))
+    products.map((p) =>
+      withPromotionPricing(
+        { ...p, imageUrl: publicProductImage(p.name, p.imageUrl) },
+        promotions
+      )
+    )
   );
 }

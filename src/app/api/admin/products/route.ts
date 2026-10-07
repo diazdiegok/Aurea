@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { publicProductImage } from "@/lib/product-images";
 import { parsePriceARS } from "@/lib/whatsapp";
 
 export async function GET() {
@@ -11,7 +12,12 @@ export async function GET() {
   const products = await db.product.findMany({
     orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json(products);
+  return NextResponse.json(
+    products.map((product) => ({
+      ...product,
+      imageUrl: publicProductImage(product.name, product.imageUrl),
+    }))
+  );
 }
 
 export async function POST(request: Request) {
