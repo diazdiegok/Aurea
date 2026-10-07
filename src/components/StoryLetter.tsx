@@ -64,7 +64,7 @@ export function StoryLetter() {
         <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#a67c52]">
           Mi historia 💫 ♥️
         </p>
-        <h1 className="mt-3 font-serif text-5xl text-[#4a3b30] sm:text-6xl">ÁUREA</h1>
+        <h1 className="mt-3 font-serif text-5xl text-[#4a3b30] sm:text-6xl">AUREA</h1>
         <p className="mt-4 max-w-xl text-lg leading-8 text-[#6d5c4d]">
           Una historia para conservar lo que alguna vez fue parte de nosotros.
         </p>
@@ -81,7 +81,7 @@ export function StoryLetter() {
 
         <div className="mt-10 space-y-8">
           <Line>
-            ÁUREA nació de algo mucho más profundo que el deseo de emprender.
+            AUREA nació de algo mucho más profundo que el deseo de emprender.
             Nació de una historia, de una emoción y de esa necesidad tan humana
             de conservar para siempre aquello que alguna vez fue parte de
             nosotros. 🤍
@@ -109,14 +109,14 @@ export function StoryLetter() {
             persona, un vínculo o un amor que merece ser guardado para siempre.
           </Line>
           <Line>
-            ÁUREA también nació de mis ganas de aprender, de crecer, de
+            AUREA también nació de mis ganas de aprender, de crecer, de
             perfeccionarme y de hacer cada pieza con el mayor cuidado y respeto
             posible. Porque detrás de cada joya hay una historia que merece ser
             tratada como única.
           </Line>
 
           <Emphasis>
-            Hoy miro todo lo que fui construyendo y entiendo que ÁUREA no es
+            Hoy miro todo lo que fui construyendo y entiendo que AUREA no es
             solamente mi emprendimiento.
           </Emphasis>
 
@@ -142,7 +142,7 @@ export function StoryLetter() {
 
           <Reveal>
             <div className="story-close rounded-[28px] bg-[#4a3b30] px-6 py-8 text-[#f7f1ea] sm:px-8">
-              <p className="font-serif text-4xl">ÁUREA.</p>
+              <p className="font-serif text-4xl">AUREA.</p>
               <p className="mt-3 text-lg leading-8 text-[#f3e6d8]">
                 Joyas hechas con amor, para guardar lo que más amamos. 🤍
               </p>

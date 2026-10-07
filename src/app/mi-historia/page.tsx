@@ -4,7 +4,7 @@ import { StoryLetter } from "@/components/StoryLetter";
 export const metadata: Metadata = {
   title: "Mi historia | Aurea Joyas ADN",
   description:
-    "ÁUREA nació para convertir recuerdos en una joya. La historia detrás de las piezas hechas con amor.",
+    "AUREA nació para convertir recuerdos en una joya. La historia detrás de las piezas hechas con amor.",
 };
 
 export default function MiHistoriaPage() {
