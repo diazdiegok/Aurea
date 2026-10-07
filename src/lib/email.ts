@@ -123,7 +123,8 @@ export function isEmailConfigured() {
 async function sendViaBrevo(
   to: string | string[],
   subject: string,
-  html: string
+  html: string,
+  replyTo?: string
 ): Promise<SendMailResult> {
   const apiKey = cleanApiKey(process.env.BREVO_API_KEY);
   if (!apiKey) {
@@ -162,7 +163,10 @@ async function sendViaBrevo(
       to: recipients.map((email) => ({ email })),
       subject,
       htmlContent: html,
-      replyTo: { email: sender.email, name: sender.name },
+      replyTo:
+        replyTo && isValidEmail(replyTo)
+          ? { email: normalizeEmail(replyTo) }
+          : { email: sender.email, name: sender.name },
     }),
   });
 
@@ -212,7 +216,8 @@ async function sendViaBrevo(
 async function sendViaResend(
   to: string,
   subject: string,
-  html: string
+  html: string,
+  replyToEmail?: string
 ): Promise<SendMailResult> {
   const apiKey = cleanApiKey(process.env.RESEND_API_KEY);
   if (!apiKey) {
@@ -226,7 +231,12 @@ async function sendViaResend(
   const from =
     process.env.EMAIL_FROM?.trim() ||
     `${SITE.emailBrand} <${SITE.contactEmail}>`;
-  const replyTo = process.env.SMTP_USER?.trim() || undefined;
+  const replyTo =
+    (replyToEmail && isValidEmail(replyToEmail)
+      ? normalizeEmail(replyToEmail)
+      : undefined) ||
+    process.env.SMTP_USER?.trim() ||
+    undefined;
 
   const resend = new Resend(apiKey);
   const { data, error } = await resend.emails.send({
@@ -258,7 +268,8 @@ async function sendViaResend(
 export async function sendMail(
   to: string | string[],
   subject: string,
-  html: string
+  html: string,
+  options?: { replyTo?: string }
 ): Promise<SendMailResult> {
   const provider = getEmailProvider();
   if (!provider) {
@@ -271,11 +282,13 @@ export async function sendMail(
   }
 
   try {
-    if (provider === "brevo") return await sendViaBrevo(to, subject, html);
+    if (provider === "brevo") {
+      return await sendViaBrevo(to, subject, html, options?.replyTo);
+    }
 
     const list = Array.isArray(to) ? to : [to];
     const results = await Promise.all(
-      list.map((email) => sendViaResend(email, subject, html))
+      list.map((email) => sendViaResend(email, subject, html, options?.replyTo))
     );
     const failed = results.filter((r) => !r.ok);
     if (failed.length === results.length) return failed[0];
@@ -557,4 +570,31 @@ export function normalizeEmail(value: string) {
 
 export function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
+}
+
+export async function sendContactInquiryEmail(input: {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+}) {
+  const phone = input.phone?.trim();
+  const body = `
+    <p style="margin:16px 0 0;line-height:1.6;color:#6d5c4d;font-size:15px;">
+      Llegó una consulta desde el formulario de contacto.
+    </p>
+    <p style="margin:16px 0 0;line-height:1.6;color:#4a3b30;font-size:15px;">
+      <strong>Nombre:</strong> ${escapeHtml(input.name)}<br />
+      <strong>Correo:</strong> ${escapeHtml(input.email)}<br />
+      ${phone ? `<strong>Teléfono:</strong> ${escapeHtml(phone)}<br />` : ""}
+    </p>
+    <p style="margin:16px 0 0;line-height:1.7;color:#4a3b30;font-size:15px;">${escapeHtml(input.message).replace(/\n/g, "<br />")}</p>
+  `;
+
+  return sendMail(
+    getOrderNotifyEmails(),
+    `Consulta web — ${input.name}`,
+    wrapEmail("Nueva consulta", body),
+    { replyTo: input.email }
+  );
 }

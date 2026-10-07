@@ -288,6 +288,52 @@ body {
   display: none;
 }
 
+@keyframes ashes-drift {
+  0% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1.08) translate3d(-1.2%, -0.8%, 0);
+  }
+}
+
+@keyframes ashes-gleam {
+  0%,
+  58% {
+    transform: translateX(-130%) skewX(-16deg);
+    opacity: 0;
+  }
+  68% {
+    opacity: 0.72;
+  }
+  100% {
+    transform: translateX(280%) skewX(-16deg);
+    opacity: 0;
+  }
+}
+
+.ashes-photo {
+  animation: ashes-drift 16s ease-in-out infinite alternate;
+}
+
+.ashes-gleam {
+  position: absolute;
+  top: -15%;
+  bottom: -15%;
+  left: 0;
+  width: 28%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15) 35%,
+    rgba(255, 255, 255, 0.72) 50%,
+    rgba(255, 255, 255, 0.15) 65%,
+    transparent
+  );
+  animation: ashes-gleam 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -303,7 +349,9 @@ body {
   .animate-backdrop-in,
   .animate-lightbox-zoom,
   .animate-added,
-  .skeleton-shimmer {
+  .skeleton-shimmer,
+  .ashes-photo,
+  .ashes-gleam {
     animation: none !important;
   }
 

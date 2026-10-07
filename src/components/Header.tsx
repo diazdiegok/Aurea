@@ -3,12 +3,25 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { SITE } from "@/lib/config";
 import { useCart } from "@/context/CartContext";
 import { CartIcon, TruckIcon } from "@/components/Icons";
 
+const NAV = [
+  { href: "/", label: "Productos" },
+  { href: "/joyas-cenizas", label: "Joyas con cenizas de cremación" },
+  { href: "/contacto", label: "Contacto" },
+] as const;
+
+function isActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function Header() {
   const { count, openCart } = useCart();
+  const pathname = usePathname();
   const [pop, setPop] = useState(false);
 
   useEffect(() => {
@@ -74,6 +87,28 @@ export function Header() {
           </button>
         </div>
       </div>
+
+      <nav aria-label="Secciones" className="border-t border-[#e4d5c5]/70">
+        <div className="mx-auto flex max-w-6xl items-stretch gap-1 overflow-x-auto px-2 sm:justify-center sm:px-6">
+          {NAV.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={`shrink-0 border-b-2 px-3 py-2.5 text-[13px] font-medium transition sm:px-4 sm:text-sm ${
+                  active
+                    ? "border-[#a67c52] text-[#4a3b30]"
+                    : "border-transparent text-[#6d5c4d] hover:border-[#d4b896] hover:text-[#4a3b30]"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </header>
   );
 }
