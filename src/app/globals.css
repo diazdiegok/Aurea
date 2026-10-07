@@ -279,6 +279,22 @@ body {
   transform: scale(1.05);
 }
 
+@keyframes story-close {
+  0%,
+  100% {
+    box-shadow: 0 18px 40px -28px rgba(74, 59, 48, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 18px 40px -28px rgba(74, 59, 48, 0.45),
+      0 0 36px rgba(212, 184, 150, 0.45);
+  }
+}
+
+.story-close {
+  animation: story-close 4.5s ease-in-out infinite;
+}
+
 .scrollbar-none {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -353,7 +369,8 @@ body {
   .animate-added,
   .skeleton-shimmer,
   .ashes-piece,
-  .ashes-ground {
+  .ashes-ground,
+  .story-close {
     animation: none !important;
   }
 

@@ -12,6 +12,7 @@ const NAV = [
   { href: "/", label: "Productos" },
   { href: "/joyas-cenizas", label: "Joyas con cenizas de cremación" },
   { href: "/contacto", label: "Contacto" },
+  { href: "/mi-historia", label: "Mi historia 💫 ♥️" },
 ] as const;
 
 function isActive(pathname: string, href: string) {
