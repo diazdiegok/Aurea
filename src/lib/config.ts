@@ -44,5 +44,5 @@ export function getBaseUrl() {
 
 /** Logo limpio para correos (CDN; evita cold start de Render). */
 export function getEmailLogoUrl() {
-  return "https://cdn.jsdelivr.net/gh/diazdiegok/Aurea@4ef603bd1b2ec8a83e799383b998b4272ca89124/public/email-logo.png";
+  return "https://cdn.jsdelivr.net/gh/diazdiegok/Aurea@dcb549a53c83628591dd6ec7ecb9b4c4da62dad1/public/email-logo.png";
 }
