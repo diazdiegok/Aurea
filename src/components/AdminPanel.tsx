@@ -154,6 +154,45 @@ export function AdminPanel() {
     }
   }
 
+  function imageFromClipboard(data: DataTransfer | null) {
+    if (!data) return null;
+    const item = Array.from(data.items).find(
+      (entry) => entry.kind === "file" && entry.type.startsWith("image/")
+    );
+    const pasted = item?.getAsFile();
+    if (pasted) {
+      const ext = pasted.type.split("/")[1]?.replace("jpeg", "jpg") || "png";
+      const name =
+        pasted.name && pasted.name !== "image.png"
+          ? pasted.name
+          : `producto-${Date.now()}.${ext}`;
+      return new File([pasted], name, { type: pasted.type || "image/png" });
+    }
+    return Array.from(data.files).find((file) => file.type.startsWith("image/")) ?? null;
+  }
+
+  useEffect(() => {
+    if (!authenticated || tab !== "products") return;
+
+    function onPaste(event: ClipboardEvent) {
+      if (uploading) return;
+      const file = imageFromClipboard(event.clipboardData);
+      if (!file) return;
+      const target = event.target;
+      const typing =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      const text = event.clipboardData?.getData("text/plain").trim();
+      if (typing && text) return;
+      event.preventDefault();
+      void handleUpload(file);
+    }
+
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [authenticated, tab, uploading]);
+
   function startEdit(product: Product) {
     setEditingId(product.id);
     setSelectedFileName("");
@@ -516,7 +555,7 @@ export function AdminPanel() {
                 {uploading ? "Optimizando imagen..." : "Seleccionar imagen"}
               </span>
               <span className="text-xs text-[#9a8b7e]">
-                JPG, PNG o WebP · hasta 15 MB
+                JPG, PNG o WebP · hasta 15 MB · o pegá con Ctrl+V
               </span>
               {selectedFileName && !uploading && (
                 <span className="mt-1 truncate text-xs text-[#9a7349]">
