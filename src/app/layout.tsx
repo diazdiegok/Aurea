@@ -4,6 +4,7 @@ import { CartProvider } from "@/context/CartContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
+import { CyberWeekSplash } from "@/components/CyberWeekSplash";
 import { SITE, getBaseUrl } from "@/lib/config";
 import "./globals.css";
 
@@ -54,6 +55,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <CartDrawer />
+          <CyberWeekSplash />
         </CartProvider>
       </body>
     </html>

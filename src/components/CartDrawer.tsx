@@ -12,7 +12,7 @@ import {
 } from "@/lib/phone";
 import { SITE } from "@/lib/config";
 import { useCart } from "@/context/CartContext";
-import { WhatsAppIcon } from "@/components/Icons";
+import { RocketIcon, WhatsAppIcon } from "@/components/Icons";
 import { NoticeDialog } from "@/components/ConfirmDialog";
 
 export function CartDrawer() {
@@ -407,6 +407,10 @@ export function CartDrawer() {
             </div>
           ) : (
             <div className="space-y-5 pb-2">
+              <div className="flex items-center gap-2.5 rounded-2xl border border-[#d4b896] bg-[#f5ebe3] px-3.5 py-2.5 text-sm text-[#4a3b30]">
+                <RocketIcon className="h-4 w-4 shrink-0 text-[#a67c52]" />
+                <span>Envío gratis en todas las piezas</span>
+              </div>
               <ul className="space-y-2">
                 {items.map((item) => (
                   <li
@@ -562,6 +566,13 @@ export function CartDrawer() {
                   </div>
                 </>
               )}
+              <div className="flex items-center justify-between text-sm text-[#2f6f5e]">
+                <span className="inline-flex items-center gap-1.5">
+                  <RocketIcon className="h-4 w-4" />
+                  Envío
+                </span>
+                <span className="font-medium">Gratis</span>
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm uppercase tracking-[0.16em] text-[#8a7b6e]">
                   Total
