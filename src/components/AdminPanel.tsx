@@ -281,12 +281,14 @@ export function AdminPanel() {
   }
 
   if (authenticated === null) {
-    return <p className="p-8 text-center text-stone-500">Cargando...</p>;
+    return (
+      <p className="bg-[#f7f1ea] p-8 text-center text-stone-500">Cargando...</p>
+    );
   }
 
   if (!authenticated) {
     return (
-      <main className="mx-auto flex min-h-[70vh] max-w-md items-center px-4 py-16">
+      <main className="mx-auto flex min-h-[70vh] max-w-md items-center bg-[#f7f1ea] px-4 py-16 text-[#4a3b30]">
         {loginStep === "password" ? (
           <form
             onSubmit={handleLogin}
@@ -372,7 +374,7 @@ export function AdminPanel() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <main className="mx-auto max-w-5xl bg-[#f7f1ea] px-4 py-10 text-[#4a3b30] sm:px-6">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-serif text-3xl text-stone-800">Administración</h1>
@@ -430,7 +432,7 @@ export function AdminPanel() {
       {tab === "coupons" && <AdminCoupons />}
 
       {tab === "promotions" && (
-        <AdminPromotions categories={categoryOptions} />
+        <AdminPromotions categories={categoryOptions} products={products} />
       )}
 
       {tab === "categories" && (

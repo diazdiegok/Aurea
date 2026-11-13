@@ -4,6 +4,7 @@ export type ActivePromotion = {
   id: string;
   name: string;
   categories: string[];
+  productIds: string[];
   percentOff: number;
   endsAt: Date;
 };
@@ -38,21 +39,23 @@ export async function getActivePromotions(): Promise<ActivePromotion[]> {
     id: p.id,
     name: p.name,
     categories: p.categories,
+    productIds: p.productIds || [],
     percentOff: p.percentOff,
     endsAt: p.endsAt,
   }));
 }
 
-export function findPromoForCategory(
-  category: string,
+export function findPromoForProduct(
+  product: { id: string; category: string },
   promotions: ActivePromotion[]
 ) {
   return (
-    promotions.find((p) =>
-      p.categories.some(
-        (c) => c.trim().toLowerCase() === category.trim().toLowerCase()
-      )
-    ) || null
+    promotions.find((p) => {
+      if (p.productIds?.some((id) => id === product.id)) return true;
+      return p.categories.some(
+        (c) => c.trim().toLowerCase() === product.category.trim().toLowerCase()
+      );
+    }) || null
   );
 }
 
@@ -61,7 +64,9 @@ export function salePriceFrom(price: number, percentOff: number) {
   return Math.max(0, Math.round(price * (1 - pct / 100)));
 }
 
-export function withPromotionPricing<T extends { price: number; category: string }>(
+export function withPromotionPricing<
+  T extends { id: string; price: number; category: string },
+>(
   product: T,
   promotions: ActivePromotion[]
 ): T & {
@@ -70,7 +75,7 @@ export function withPromotionPricing<T extends { price: number; category: string
   promotionEndsAt: string | null;
   promotionId: string | null;
 } {
-  const promo = findPromoForCategory(product.category, promotions);
+  const promo = findPromoForProduct(product, promotions);
   if (!promo) {
     return {
       ...product,

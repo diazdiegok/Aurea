@@ -22,13 +22,22 @@ export async function POST(request: NextRequest) {
   const categories = Array.isArray(body.categories)
     ? body.categories.map((c: string) => String(c).trim()).filter(Boolean)
     : [];
+  const productIds: string[] = Array.isArray(body.productIds)
+    ? [
+        ...new Set(
+          (body.productIds as unknown[])
+            .map((id) => String(id).trim())
+            .filter(Boolean)
+        ),
+      ]
+    : [];
   const percentOff = Number(body.percentOff);
   const hours = Math.max(1, Math.floor(Number(body.hours) || 0));
   const name = String(body.name || "").trim();
 
-  if (!categories.length) {
+  if (!categories.length && !productIds.length) {
     return NextResponse.json(
-      { error: "Elegí al menos una categoría" },
+      { error: "Elegí al menos una categoría o un producto" },
       { status: 400 }
     );
   }
@@ -45,6 +54,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (productIds.length) {
+    const found = await db.product.count({
+      where: { id: { in: productIds } },
+    });
+    if (found !== productIds.length) {
+      return NextResponse.json(
+        { error: "Hay productos seleccionados que ya no existen" },
+        { status: 400 }
+      );
+    }
+  }
+
   const startsAt = new Date();
   const endsAt = new Date(startsAt.getTime() + hours * 60 * 60 * 1000);
 
@@ -52,6 +73,7 @@ export async function POST(request: NextRequest) {
     data: {
       name: name || `Promo −${percentOff}%`,
       categories,
+      productIds,
       percentOff,
       hours,
       startsAt,

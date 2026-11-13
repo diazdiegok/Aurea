@@ -79,6 +79,7 @@ model Promotion {
   id         String   @id @default(cuid())
   name       String   @default("")
   categories String[]
+  productIds String[] @default([])
   percentOff Float
   hours      Int
   startsAt   DateTime @default(now())
