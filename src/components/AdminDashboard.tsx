@@ -22,6 +22,8 @@ type DashboardData = {
     ordersWeek: number;
     ordersMonth: number;
     ordersAll: number;
+    ordersTotal?: number;
+    ordersCancelled?: number;
     avgTicket: number;
     pending: number;
     byChannel: {
@@ -174,6 +176,13 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
                 </>
               )}
             </p>
+            {(data.sales.ordersTotal ?? 0) === 0 && (
+              <p className="mt-3 max-w-md rounded-xl border border-[#e8ddd3] bg-white/70 px-3 py-2 text-sm text-[#6d5c4d]">
+                No hay pedidos en la base (ni completados ni pendientes). El
+                catálogo sigue intacto. Revisá Neon por un backup o la pestaña
+                Ventas.
+              </p>
+            )}
           </div>
 
           {data.sales.pending > 0 ? (

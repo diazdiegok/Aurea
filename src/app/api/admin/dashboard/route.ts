@@ -37,6 +37,7 @@ export async function GET() {
     ]);
 
   const counted = allOrders.filter((o) => COUNTED.includes(o.status));
+  const cancelledOrders = allOrders.filter((o) => o.status === "cancelled");
   const countedMonth = counted.filter((o) => o.createdAt >= month);
 
   const revenueAll = counted.reduce((s, o) => s + o.total, 0);
@@ -130,6 +131,8 @@ export async function GET() {
       ordersWeek,
       ordersMonth,
       ordersAll,
+      ordersTotal: allOrders.length,
+      ordersCancelled: cancelledOrders.length,
       avgTicket,
       pending: pendingCount,
       byChannel,
