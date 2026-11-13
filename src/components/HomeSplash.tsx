@@ -1,23 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { RocketIcon } from "@/components/Icons";
 
-const STORAGE_KEY = "aurea-cyberweek-closed";
+type Splash = {
+  active: boolean;
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+  imageUrl: string | null;
+};
 
-export function CyberWeekSplash() {
+const STORAGE_KEY = "aurea-home-splash-closed";
+
+export function HomeSplash() {
   const pathname = usePathname();
+  const [splash, setSplash] = useState<Splash | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (pathname.startsWith("/admin")) return;
-    try {
-      if (sessionStorage.getItem(STORAGE_KEY) === "1") return;
-    } catch {
-      /* sessionStorage can fail in private mode */
-    }
-    setOpen(true);
+    let cancelled = false;
+    fetch("/api/splash")
+      .then(async (r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (cancelled || !json?.active || !json.title) return;
+        setSplash(json as Splash);
+        try {
+          if (sessionStorage.getItem(STORAGE_KEY) === "1") return;
+        } catch {
+          /* ignore */
+        }
+        setOpen(true);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [pathname]);
 
   function close() {
@@ -43,7 +63,7 @@ export function CyberWeekSplash() {
     };
   }, [open]);
 
-  if (!open) return null;
+  if (!open || !splash) return null;
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center px-4 py-8">
@@ -56,7 +76,7 @@ export function CyberWeekSplash() {
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="cyberweek-title"
+        aria-labelledby="home-splash-title"
         className="relative w-full max-w-[26rem] overflow-hidden rounded-[1.8rem] border border-[#e4c48a]/40 bg-[#14110e] text-[#f6f1ea] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]"
       >
         <div
@@ -75,26 +95,42 @@ export function CyberWeekSplash() {
         >
           ✕
         </button>
-        <div className="relative px-8 pb-8 pt-12 text-center sm:px-10">
+        {splash.imageUrl && (
+          <div className="relative mx-4 mt-12 aspect-[16/10] overflow-hidden rounded-2xl">
+            <Image
+              src={splash.imageUrl}
+              alt=""
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+        )}
+        <div
+          className={`relative px-8 pb-8 text-center sm:px-10 ${
+            splash.imageUrl ? "pt-6" : "pt-12"
+          }`}
+        >
           <p className="text-[11px] font-medium uppercase tracking-[0.34em] text-[#e4c48a]">
             Aurea Joyas
           </p>
           <h2
-            id="cyberweek-title"
-            className="mt-5 font-serif text-[2.35rem] font-medium leading-[1.05] tracking-[-0.03em] text-[#f7f1ea]"
+            id="home-splash-title"
+            className="mt-5 font-serif text-[2.1rem] font-medium leading-[1.05] tracking-[-0.03em] text-[#f7f1ea] sm:text-[2.35rem]"
           >
-            ¡Aprovechá las ofertas del Cyberweek!
+            {splash.title}
           </h2>
-          <p className="mx-auto mt-5 inline-flex items-center justify-center gap-2 text-sm leading-relaxed text-[#f0d7a8]">
-            <RocketIcon className="h-4 w-4 shrink-0" />
-            Envíos gratis y precios increíbles
-          </p>
+          {splash.subtitle && (
+            <p className="mx-auto mt-5 text-sm leading-relaxed text-[#f0d7a8]">
+              {splash.subtitle}
+            </p>
+          )}
           <button
             type="button"
             onClick={close}
             className="btn-press mt-8 w-full rounded-full bg-[#e4c48a] py-3.5 text-sm font-medium text-[#14110e] transition hover:bg-[#f0d7a8]"
           >
-            Entrar a la tienda
+            {splash.ctaLabel || "Entrar a la tienda"}
           </button>
         </div>
       </div>

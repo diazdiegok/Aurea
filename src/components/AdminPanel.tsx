@@ -9,6 +9,7 @@ import { AdminOrders } from "@/components/AdminOrders";
 import { AdminCoupons } from "@/components/AdminCoupons";
 import { AdminPromotions } from "@/components/AdminPromotions";
 import { AdminCategories } from "@/components/AdminCategories";
+import { AdminHome } from "@/components/AdminHome";
 import { ConfirmDialog, NoticeDialog } from "@/components/ConfirmDialog";
 
 type Product = {
@@ -55,6 +56,7 @@ export function AdminPanel() {
   const [notice, setNotice] = useState<string | null>(null);
   const [tab, setTab] = useState<
     | "dashboard"
+    | "home"
     | "orders"
     | "products"
     | "categories"
@@ -401,6 +403,7 @@ export function AdminPanel() {
         {(
           [
             ["dashboard", "Dashboard"],
+            ["home", "Inicio"],
             ["orders", "Ventas"],
             ["products", "Productos"],
             ["categories", "Categorías"],
@@ -426,6 +429,8 @@ export function AdminPanel() {
       {tab === "dashboard" && (
         <AdminDashboard onGoOrders={() => setTab("orders")} />
       )}
+
+      {tab === "home" && <AdminHome />}
 
       {tab === "orders" && <AdminOrders products={products} />}
 
