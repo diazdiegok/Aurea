@@ -306,7 +306,7 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
         {/* Canales */}
         <section className="rounded-3xl border border-[#e4d5c5] bg-white p-5 sm:p-6 lg:col-span-2">
           <h3 className="font-serif text-2xl text-[#4a3b30]">Canales</h3>
-          <p className="mt-1 text-sm text-[#8a7b6e]">Últimos 30 días</p>
+          <p className="mt-1 text-sm text-[#8a7b6e]">Histórico completo</p>
 
           <ul className="mt-5 space-y-4">
             {channels.map(([key, stat]) => {
@@ -427,7 +427,7 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
 
         <section className="rounded-3xl border border-[#e4d5c5] bg-white p-5 sm:p-6">
           <h3 className="font-serif text-2xl text-[#4a3b30]">Más vendidos</h3>
-          <p className="mt-1 text-sm text-[#8a7b6e]">Por facturación · 30 días</p>
+          <p className="mt-1 text-sm text-[#8a7b6e]">Por facturación · histórico</p>
 
           {data.topProducts.length === 0 ? (
             <p className="mt-5 text-sm text-[#8a7b6e]">
