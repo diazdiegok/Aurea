@@ -17,13 +17,9 @@ type DashboardData = {
     revenueToday: number;
     revenueWeek: number;
     revenueMonth: number;
-    revenueAll: number;
     ordersToday: number;
     ordersWeek: number;
     ordersMonth: number;
-    ordersAll: number;
-    ordersTotal?: number;
-    ordersCancelled?: number;
     avgTicket: number;
     pending: number;
     byChannel: {
@@ -155,17 +151,14 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#a67c52]">
-              Histórico total
+              Últimos 30 días
             </p>
             <p className="mt-2 font-serif text-4xl text-[#4a3b30] sm:text-5xl">
-              {formatPrice(data.sales.revenueAll ?? data.sales.revenueMonth)}
+              {formatPrice(data.sales.revenueMonth)}
             </p>
             <p className="mt-2 text-sm text-[#6d5c4d]">
-              {data.sales.ordersAll ?? data.sales.ordersMonth}{" "}
-              {(data.sales.ordersAll ?? data.sales.ordersMonth) === 1
-                ? "venta"
-                : "ventas"}{" "}
-              completadas
+              {data.sales.ordersMonth}{" "}
+              {data.sales.ordersMonth === 1 ? "venta" : "ventas"}
               {data.sales.avgTicket > 0 && (
                 <>
                   {" "}
@@ -176,13 +169,6 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
                 </>
               )}
             </p>
-            {(data.sales.ordersTotal ?? 0) === 0 && (
-              <p className="mt-3 max-w-md rounded-xl border border-[#e8ddd3] bg-white/70 px-3 py-2 text-sm text-[#6d5c4d]">
-                No hay pedidos en la base (ni completados ni pendientes). El
-                catálogo sigue intacto. Revisá Neon por un backup o la pestaña
-                Ventas.
-              </p>
-            )}
           </div>
 
           {data.sales.pending > 0 ? (
@@ -213,7 +199,7 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
           )}
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
           {[
             {
               label: "Hoy",
@@ -224,11 +210,6 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
               label: "Esta semana",
               value: formatPrice(data.sales.revenueWeek),
               sub: `${data.sales.ordersWeek} venta${data.sales.ordersWeek === 1 ? "" : "s"}`,
-            },
-            {
-              label: "Últimos 30 días",
-              value: formatPrice(data.sales.revenueMonth),
-              sub: `${data.sales.ordersMonth} venta${data.sales.ordersMonth === 1 ? "" : "s"}`,
             },
             {
               label: "Catálogo",
@@ -315,7 +296,7 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
         {/* Canales */}
         <section className="rounded-3xl border border-[#e4d5c5] bg-white p-5 sm:p-6 lg:col-span-2">
           <h3 className="font-serif text-2xl text-[#4a3b30]">Canales</h3>
-          <p className="mt-1 text-sm text-[#8a7b6e]">Histórico completo</p>
+          <p className="mt-1 text-sm text-[#8a7b6e]">Últimos 30 días</p>
 
           <ul className="mt-5 space-y-4">
             {channels.map(([key, stat]) => {
@@ -436,7 +417,7 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
 
         <section className="rounded-3xl border border-[#e4d5c5] bg-white p-5 sm:p-6">
           <h3 className="font-serif text-2xl text-[#4a3b30]">Más vendidos</h3>
-          <p className="mt-1 text-sm text-[#8a7b6e]">Por facturación · histórico</p>
+          <p className="mt-1 text-sm text-[#8a7b6e]">Por facturación · 30 días</p>
 
           {data.topProducts.length === 0 ? (
             <p className="mt-5 text-sm text-[#8a7b6e]">

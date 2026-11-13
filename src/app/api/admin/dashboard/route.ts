@@ -15,10 +15,11 @@ export async function GET() {
   const week = daysAgo(6);
   const month = daysAgo(29);
 
-  const [products, allOrders, recent, pendingOrders, pendingCount] =
+  const [products, orders, recent, pendingOrders, pendingCount] =
     await Promise.all([
       db.product.findMany(),
       db.order.findMany({
+        where: { createdAt: { gte: month } },
         include: { items: true },
         orderBy: { createdAt: "asc" },
       }),
@@ -36,13 +37,9 @@ export async function GET() {
       db.order.count({ where: { status: "pending" } }),
     ]);
 
-  const counted = allOrders.filter((o) => COUNTED.includes(o.status));
-  const cancelledOrders = allOrders.filter((o) => o.status === "cancelled");
-  const countedMonth = counted.filter((o) => o.createdAt >= month);
+  const counted = orders.filter((o) => COUNTED.includes(o.status));
 
-  const revenueAll = counted.reduce((s, o) => s + o.total, 0);
-  const ordersAll = counted.length;
-  const revenueMonth = countedMonth.reduce((s, o) => s + o.total, 0);
+  const revenueMonth = counted.reduce((s, o) => s + o.total, 0);
   const revenueWeek = counted
     .filter((o) => o.createdAt >= week)
     .reduce((s, o) => s + o.total, 0);
@@ -50,10 +47,10 @@ export async function GET() {
     .filter((o) => o.createdAt >= today)
     .reduce((s, o) => s + o.total, 0);
 
-  const ordersMonth = countedMonth.length;
+  const ordersMonth = counted.length;
   const ordersWeek = counted.filter((o) => o.createdAt >= week).length;
   const ordersToday = counted.filter((o) => o.createdAt >= today).length;
-  const avgTicket = ordersAll > 0 ? Math.round(revenueAll / ordersAll) : 0;
+  const avgTicket = ordersMonth > 0 ? Math.round(revenueMonth / ordersMonth) : 0;
 
   const channelKeys = ["whatsapp", "transfer", "mercadopago", "manual"] as const;
   const byChannel = Object.fromEntries(
@@ -126,13 +123,9 @@ export async function GET() {
       revenueToday,
       revenueWeek,
       revenueMonth,
-      revenueAll,
       ordersToday,
       ordersWeek,
       ordersMonth,
-      ordersAll,
-      ordersTotal: allOrders.length,
-      ordersCancelled: cancelledOrders.length,
       avgTicket,
       pending: pendingCount,
       byChannel,
