@@ -27,5 +27,15 @@ try {
   console.warn("Seed inicial omitido o falló.");
 }
 
+console.log("Aplicando fotos de producto corregidas...");
+try {
+  execSync("npx tsx prisma/apply-product-image-fixes.mts", {
+    stdio: "inherit",
+    cwd: root,
+  });
+} catch {
+  console.warn("No se pudieron aplicar fixes de fotos.");
+}
+
 console.log("Iniciando servidor...");
 execSync("npx next start", { stdio: "inherit", cwd: root });
