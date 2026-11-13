@@ -12,26 +12,25 @@ type Splash = {
   imageUrl: string | null;
 };
 
-const STORAGE_KEY = "aurea-home-splash-closed";
-
 export function HomeSplash() {
   const pathname = usePathname();
   const [splash, setSplash] = useState<Splash | null>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (pathname.startsWith("/admin")) return;
+    if (pathname.startsWith("/admin")) {
+      setOpen(false);
+      return;
+    }
     let cancelled = false;
     fetch("/api/splash")
       .then(async (r) => (r.ok ? r.json() : null))
       .then((json) => {
-        if (cancelled || !json?.active || !json.title) return;
-        setSplash(json as Splash);
-        try {
-          if (sessionStorage.getItem(STORAGE_KEY) === "1") return;
-        } catch {
-          /* ignore */
+        if (cancelled || !json?.active || !json.title) {
+          setOpen(false);
+          return;
         }
+        setSplash(json as Splash);
         setOpen(true);
       })
       .catch(() => {});
@@ -41,11 +40,6 @@ export function HomeSplash() {
   }, [pathname]);
 
   function close() {
-    try {
-      sessionStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      /* ignore */
-    }
     setOpen(false);
   }
 
