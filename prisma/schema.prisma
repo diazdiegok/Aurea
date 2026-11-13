@@ -8,16 +8,18 @@ datasource db {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String   @default("")
-  price       Float
-  imageUrl    String?
-  category    String   @default("General")
-  featured    Boolean  @default(false)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  description  String   @default("")
+  price        Float
+  imageUrl     String?
+  category     String   @default("General")
+  featured     Boolean  @default(false)
+  active       Boolean  @default(true)
+  twoForOne    Boolean  @default(false)
+  freeShipping Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Category {

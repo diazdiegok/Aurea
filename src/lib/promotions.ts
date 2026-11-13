@@ -18,6 +18,8 @@ export type ProductWithPromo = {
   category: string;
   featured: boolean;
   active?: boolean;
+  twoForOne?: boolean;
+  freeShipping?: boolean;
   salePrice?: number | null;
   promotionPercent?: number | null;
   promotionEndsAt?: string | null;

@@ -15,6 +15,8 @@ type Product = {
   imageUrl: string | null;
   category: string;
   featured: boolean;
+  twoForOne?: boolean;
+  freeShipping?: boolean;
   salePrice?: number | null;
   promotionPercent?: number | null;
   promotionEndsAt?: string | null;
@@ -36,6 +38,8 @@ export function ProductCard({
     product.salePrice < product.price &&
     (product.promotionPercent || 0) > 0;
   const displayPrice = onSale ? product.salePrice! : product.price;
+  const showFreeShipping = product.freeShipping !== false;
+  const showTwoForOne = Boolean(product.twoForOne);
 
   function handleAdd() {
     addItem({
@@ -108,6 +112,14 @@ export function ProductCard({
               </span>
             )}
           </div>
+
+          {showTwoForOne && (
+            <div className="pointer-events-none absolute right-3 top-3">
+              <span className="inline-flex items-center rounded-full bg-[#2f6f5e] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white shadow-sm">
+                2x1
+              </span>
+            </div>
+          )}
         </div>
 
         <div
@@ -157,10 +169,12 @@ export function ProductCard({
                   {formatPrice(product.price)}
                 </p>
               )}
-              <p className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-[#2f6f5e]">
-                <RocketIcon className="h-3.5 w-3.5" />
-                Envío gratis
-              </p>
+              {showFreeShipping && (
+                <p className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-[#2f6f5e]">
+                  <RocketIcon className="h-3.5 w-3.5" />
+                  Envío gratis
+                </p>
+              )}
             </div>
             <button
               type="button"

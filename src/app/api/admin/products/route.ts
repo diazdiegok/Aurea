@@ -26,7 +26,17 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { name, description, price, imageUrl, category, featured, active } = body;
+  const {
+    name,
+    description,
+    price,
+    imageUrl,
+    category,
+    featured,
+    active,
+    twoForOne,
+    freeShipping,
+  } = body;
 
   if (!name || price == null || price === "") {
     return NextResponse.json({ error: "Nombre y precio son obligatorios" }, { status: 400 });
@@ -49,6 +59,8 @@ export async function POST(request: Request) {
       category: String(category || "General").trim(),
       featured: Boolean(featured),
       active: active !== false,
+      twoForOne: Boolean(twoForOne),
+      freeShipping: freeShipping !== false,
     },
   });
 

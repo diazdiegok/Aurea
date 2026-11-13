@@ -21,6 +21,8 @@ type Product = {
   category: string;
   featured: boolean;
   active: boolean;
+  twoForOne?: boolean;
+  freeShipping?: boolean;
 };
 
 const emptyForm = {
@@ -30,6 +32,8 @@ const emptyForm = {
   category: "",
   featured: false,
   active: true,
+  twoForOne: false,
+  freeShipping: true,
   imageUrl: "" as string | null,
 };
 
@@ -205,6 +209,8 @@ export function AdminPanel() {
       category: product.category,
       featured: product.featured,
       active: product.active,
+      twoForOne: Boolean(product.twoForOne),
+      freeShipping: product.freeShipping !== false,
       imageUrl: product.imageUrl,
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -617,6 +623,28 @@ export function AdminPanel() {
             />
             Visible en catálogo
           </label>
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <input
+              type="checkbox"
+              checked={form.twoForOne}
+              onChange={(e) =>
+                setForm({ ...form, twoForOne: e.target.checked })
+              }
+              className="h-4 w-4 rounded border-[#d4b896] text-[#5c4a3d] focus:ring-[#c9956a]"
+            />
+            Promo 2x1
+          </label>
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <input
+              type="checkbox"
+              checked={form.freeShipping}
+              onChange={(e) =>
+                setForm({ ...form, freeShipping: e.target.checked })
+              }
+              className="h-4 w-4 rounded border-[#d4b896] text-[#5c4a3d] focus:ring-[#c9956a]"
+            />
+            Envío gratis
+          </label>
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
@@ -680,6 +708,8 @@ export function AdminPanel() {
                 </p>
                 <p className="text-sm text-stone-500">
                   {product.category} · {formatPrice(product.price)}
+                  {product.twoForOne ? " · 2x1" : ""}
+                  {product.freeShipping !== false ? " · envío gratis" : ""}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">

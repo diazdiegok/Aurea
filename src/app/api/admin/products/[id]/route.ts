@@ -46,6 +46,10 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       ...(body.category != null && { category: String(body.category).trim() }),
       ...(body.featured != null && { featured: Boolean(body.featured) }),
       ...(body.active != null && { active: Boolean(body.active) }),
+      ...(body.twoForOne != null && { twoForOne: Boolean(body.twoForOne) }),
+      ...(body.freeShipping != null && {
+        freeShipping: Boolean(body.freeShipping),
+      }),
     },
   });
 
