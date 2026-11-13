@@ -15,6 +15,8 @@ const REPLACEMENTS: Record<string, string> = {
     "/images/products/charms-corazon-cadena-v2.webp",
   "combo joya circulo de amor + aros circulo de amor":
     "/images/products/combo-circulo-amor-v2.webp",
+  "dije gota con diseno con cabello":
+    "/images/products/dije-gota-cabello-v2.webp",
 };
 
 /** Normaliza para comparar nombres con/sin tildes. */
