@@ -17,9 +17,11 @@ type DashboardData = {
     revenueToday: number;
     revenueWeek: number;
     revenueMonth: number;
+    revenueAll: number;
     ordersToday: number;
     ordersWeek: number;
     ordersMonth: number;
+    ordersAll: number;
     avgTicket: number;
     pending: number;
     byChannel: {
@@ -151,14 +153,17 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#a67c52]">
-              Últimos 30 días
+              Histórico total
             </p>
             <p className="mt-2 font-serif text-4xl text-[#4a3b30] sm:text-5xl">
-              {formatPrice(data.sales.revenueMonth)}
+              {formatPrice(data.sales.revenueAll ?? data.sales.revenueMonth)}
             </p>
             <p className="mt-2 text-sm text-[#6d5c4d]">
-              {data.sales.ordersMonth}{" "}
-              {data.sales.ordersMonth === 1 ? "venta" : "ventas"}
+              {data.sales.ordersAll ?? data.sales.ordersMonth}{" "}
+              {(data.sales.ordersAll ?? data.sales.ordersMonth) === 1
+                ? "venta"
+                : "ventas"}{" "}
+              completadas
               {data.sales.avgTicket > 0 && (
                 <>
                   {" "}
@@ -199,7 +204,7 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
           )}
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               label: "Hoy",
@@ -210,6 +215,11 @@ export function AdminDashboard({ onGoOrders }: { onGoOrders: () => void }) {
               label: "Esta semana",
               value: formatPrice(data.sales.revenueWeek),
               sub: `${data.sales.ordersWeek} venta${data.sales.ordersWeek === 1 ? "" : "s"}`,
+            },
+            {
+              label: "Últimos 30 días",
+              value: formatPrice(data.sales.revenueMonth),
+              sub: `${data.sales.ordersMonth} venta${data.sales.ordersMonth === 1 ? "" : "s"}`,
             },
             {
               label: "Catálogo",
